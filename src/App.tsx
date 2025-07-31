@@ -45,7 +45,7 @@ function App() {
       <img
         src={logo}
         alt="No Right Way Logo"
-        className="absolute top-4 left-4 w-32 h-auto z-50 drop-shadow-lg"
+        className="absolute top-1 left-3 w-32 h-auto z-50 drop-shadow-lg"
         style={{ pointerEvents: 'none', userSelect: 'none' }}
       />
       {showPreloader && <Preloader onComplete={handlePreloaderComplete} />}
