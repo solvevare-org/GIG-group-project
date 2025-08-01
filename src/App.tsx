@@ -33,7 +33,7 @@ function App() {
   const handleAccreditationConfirm = () => {
     // Here you would implement the actual portal access logic
     // For now, we'll just redirect to a placeholder
-    window.open('https://gigstudios.com', '_blank');
+    window.open('https://gigstudios.online', '_blank');
   };
 
   const handleTrailerClick = () => {
