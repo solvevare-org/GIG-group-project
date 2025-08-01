@@ -79,9 +79,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick, onTrailerC
                 INSTITUTIONAL AND ACCREDITED INVESTORS ACCESS
               </span>
             </span>
-            <span className="block w-full text-center mt-1">
-              MOVE TO CENTER
-            </span>
           </button>
           {/* <button 
             onClick={onTrailerClick}
