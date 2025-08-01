@@ -65,7 +65,7 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         </h1>
         
         <p className="text-red-400 text-lg tracking-[0.3em] mb-8 font-light">
-          A GIG STUDIOS PRODUCTION
+          From the Streets to the BoardRooms on WallStreet
         </p>
         
         <div className="flex justify-center mb-4">

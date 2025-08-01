@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
           </div>
           
           <p className="text-gray-400 mb-6">
-            A GIG Studios Production • Redefining Financial Success
+            From the Streets to the BoardRooms on WallStreet
           </p>
 
           <div className="flex justify-center gap-8 mb-8 text-sm">

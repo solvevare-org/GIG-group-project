@@ -38,8 +38,8 @@ const FounderStorySection: React.FC = () => {
                   <Film className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <cite className="text-white font-bold not-italic">GIG Studios Founder</cite>
-                  <p className="text-gray-400 text-sm">Former Wall Street Executive</p>
+                  <cite className="text-white font-bold not-italic">Executive Producer</cite>
+                  <p className="text-gray-400 text-sm">Terrence Gallman</p>
                 </div>
               </div>
             </div>

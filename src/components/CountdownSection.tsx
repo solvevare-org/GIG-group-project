@@ -43,7 +43,7 @@ const CountdownSection: React.FC = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-3 bg-red-900/20 border border-red-800 text-red-300 px-6 py-3 rounded-full text-sm font-bold tracking-wider mb-8">
             <Film className="w-4 h-4" />
-            WORLD PREMIERE COUNTDOWN
+            WORLD PREMIERE UPDATES
           </div>
           
           <h2 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">

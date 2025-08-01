@@ -24,7 +24,7 @@ const InvestorPortalSection: React.FC = () => {
           
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
             Join an elite network of forward-thinking investors. Access live projects, 
-            exclusive insights, and behind-the-scenes content from GIG Studios productions.
+            exclusive insights, and behind-the-scenes content.
           </p>
         </div>
 
