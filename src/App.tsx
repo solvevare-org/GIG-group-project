@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  {useState} from 'react';
 import logo from './assets/IMG-8086.png';
 import Preloader from './components/Preloader';
 import AccreditationModal from './components/AccreditationModal';
@@ -33,7 +33,7 @@ function App() {
   const handleAccreditationConfirm = () => {
     // Here you would implement the actual portal access logic
     // For now, we'll just redirect to a placeholder
-    window.open('https://gigstudios.online', '_blank');
+    window.open('_blank');
   };
 
   const handleTrailerClick = () => {

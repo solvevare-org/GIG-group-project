@@ -124,7 +124,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
 
         <p className="text-[10px] text-gray-500 text-center mt-2">
           This verification is required by federal securities law (Securities Act of 1933, Rule 506). 
-          GIG Studios does not provide investment advice. Consult your financial advisor before investing.
+          Studios does not provide investment advice. Consult your financial advisor before investing.
         </p>
       </div>
     </div>

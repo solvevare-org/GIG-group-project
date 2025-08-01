@@ -40,7 +40,7 @@ const InvestorPortalSection: React.FC = () => {
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                 </div>
                 <div className="text-gray-400 text-sm font-mono">
-                  portal.gigstudios.com
+                  From the Streets to the BoardRooms on WallStreet
                 </div>
               </div>
             </div>

@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Play, ChevronDown, Shield, ExternalLink } from 'lucide-react';
+import { ChevronDown, Shield } from 'lucide-react';
 
 interface HeroSectionProps {
   onAccreditedClick: () => void;
   onTrailerClick: () => void;
 }
 
-const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick, onTrailerClick }) => {
+const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
 

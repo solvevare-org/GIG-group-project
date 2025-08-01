@@ -73,7 +73,7 @@ const TrailerModal: React.FC<TrailerModalProps> = ({ isOpen, onClose }) => {
             className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
-            Visit GIG Studios
+            Visit From the Streets to the BoardRooms on WallStreet
           </a>
         </div>
       </div>
