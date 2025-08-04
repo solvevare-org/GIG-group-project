@@ -88,14 +88,14 @@ const AboutSection: React.FC = () => {
         <div className="mt-20 text-center">
           <p className="text-gray-400 text-base md:text-lg tracking-widest mb-10 uppercase font-semibold">Powered by Industry Leaders</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 items-center justify-items-center max-w-6xl mx-auto">
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">M88</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">United Talent Agency (UTA)</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Bassett Vance Production</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Weild &amp; Co.</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Ramo Law</div>
             <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Anthony Hemingway Productions</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer text-center">Weild Foundation for American<br/>Competitiveness</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Bravelife Productions</div>
+            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Bassett Vance Productions</div>
+            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">BraveLife Productions</div>
+            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">United Talent Agency</div>
+            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Stay M88</div>
+            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">RAMO</div>
+            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer text-center">Weild & Co. Investment Bank</div>
+            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Weild Foundation for American Competitiveness</div>
           </div>
         </div>
       </div>

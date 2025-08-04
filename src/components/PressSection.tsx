@@ -111,12 +111,17 @@ const PressSection: React.FC = () => {
             <div className="bg-gradient-to-r from-gray-900 to-black rounded-xl p-6 border border-gray-700 max-w-2xl mx-auto">
               <h4 className="text-lg font-bold text-white mb-2">Media & Press Inquiries</h4>
               <p className="text-gray-400 text-sm mb-4">
-                Download our press kit or contact our media relations team
+                Download our AHP press kit or contact our media relations team
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition-colors">
-                  Download Press Kit
-                </button>
+                <a
+                  href="https://www.anthonyhemingway.website/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition-colors inline-flex items-center justify-center"
+                >
+                  Download AHP Press Kit
+                </a>
                 <button className="border border-gray-600 hover:border-red-500 text-gray-300 hover:text-white px-6 py-2 rounded-full font-semibold transition-colors">
                   Media Contact
                 </button>

@@ -67,7 +67,7 @@ const TrailerModal: React.FC<TrailerModalProps> = ({ isOpen, onClose }) => {
         
         <div className="flex justify-center gap-4">
           <a
-            href="https://www.gigstudios.online"
+            href="https://theurbanren.myspreadshop.com"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors"

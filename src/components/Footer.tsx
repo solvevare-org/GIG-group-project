@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
             <a href="#" className="text-gray-400 hover:text-gold transition-colors duration-300">
               Contact
             </a>
-            <a href="https://www.gigstudios.online" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors duration-300">
+            <a href="https://theurbanren.myspreadshop.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors duration-300">
               From the Streets to the BoardRooms on WallStreet
             </a>
           </div>

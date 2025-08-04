@@ -53,9 +53,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
         </h1>
         <div className="mb-6">
           <p className="text-base md:text-lg text-gray-200 font-semibold tracking-wide">
-            PRODUCED AND DIRECTED BY ANTHONY HEMINGWAY<br />
-            WRITTEN BY: ANTHONY HEMINGWAY, ASHOKA <br className="hidden md:inline" />
-            THOMAS AND CLAY AYERS
+            Directed by: Anthony Hemingway<br />
+            Produced by: Anthony Hemingway and Joe Incaprera<br />
+            Written by: Anthony Hemingway, Ashoka <br className="hidden md:inline" />
+            Thomas and Clay Ayers
           </p>
         </div>
         
@@ -91,7 +92,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
         <div className="flex justify-center mb-10">
           <div className=" text-gray-200 px-4 py-3 rounded-md shadow-md text-center max-w-2xl w-full">
             <span className="text-xs md:text-sm font-semibold tracking-wide leading-snug">
-              EXECUTIVE PRODUCED BY: COURTNEY B. VANCE, ANGELA BASSETT, LYNETTE RAMIREZ,<br className="hidden md:inline" /> OMARI HARDWICK, MARSHA L. SWINTON AND DAVID WEILD IV
+              EXECUTIVE PRODUCED BY: COURTNEY B. VANCE, ANGELA BASSETT, OMARI HARDWICK,<br className="hidden md:inline" /> LYNETTE RAMIREZ AND DAVID WEILD IV
             </span>
           </div>
         </div>
