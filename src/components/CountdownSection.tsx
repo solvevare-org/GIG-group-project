@@ -98,11 +98,11 @@ const CountdownSection: React.FC = () => {
               <div className="space-y-3 text-gray-300">
                 <div className="flex items-center gap-3">
                   <Calendar className="w-5 h-5 text-red-500" />
-                  <span>June 15, 2025</span>
+                  <span className="text-xs text-gray-400 italic font-medium">To be Dated</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Clock className="w-5 h-5 text-red-500" />
-                  <span>7:00 PM EST / 4:00 PM PST</span>
+                  <span className="text-xs text-gray-400 italic font-medium">To be Dated</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Star className="w-5 h-5 text-red-500" />
