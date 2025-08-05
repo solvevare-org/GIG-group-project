@@ -88,14 +88,63 @@ const AboutSection: React.FC = () => {
         <div className="mt-20 text-center">
           <p className="text-gray-400 text-base md:text-lg tracking-widest mb-10 uppercase font-semibold">Powered by Industry Leaders</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 items-center justify-items-center max-w-6xl mx-auto">
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Anthony Hemingway Productions</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Bassett Vance Productions</div>
+            <a
+              href="https://www.ahp.film/home"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer"
+            >
+              Anthony Hemingway Productions
+            </a>
+            <a
+              href="https://bassettvanceproductions.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer"
+            >
+              Bassett Vance Productions
+            </a>
             <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">BraveLife Productions</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">United Talent Agency</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Stay M88</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">RAMO</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer text-center">Weild & Co. Investment Bank</div>
-            <div className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer">Weild Foundation for American Competitiveness</div>
+            <a
+              href="https://www.unitedtalent.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer"
+            >
+              United Talent Agency
+            </a>
+            <a
+              href="http://staym88.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer"
+            >
+              Stay M88
+            </a>
+            <a
+              href="https://ramolaw.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer"
+            >
+              RAMO
+            </a>
+            <a
+              href="https://www.weildco.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer text-center"
+            >
+              Weild & Co. Investment Bank
+            </a>
+            <a
+              href="https://www.weildfoundation.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-200 font-bold text-base md:text-lg hover:text-red-400 transition-colors cursor-pointer"
+            >
+              Weild Foundation for American Competitiveness
+            </a>
           </div>
         </div>
       </div>
