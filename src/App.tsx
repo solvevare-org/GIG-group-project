@@ -41,17 +41,17 @@ function App() {
   };
   return (
     <div className="bg-black text-white relative min-h-screen">
-      {/* Logo in top left corner */}
+      {/* Responsive Logo in top left corner */}
       <img
         src={logo}
         alt="No Right Way Logo"
-        className="absolute top-1 left-3 w-32 h-auto z-50 drop-shadow-lg"
+        className="absolute left-2 top-2 w-16 sm:left-3 sm:top-4 sm:w-24 md:top-6 md:w-28 lg:top-8 lg:w-32 h-auto z-50 drop-shadow-lg transition-all duration-300"
         style={{ pointerEvents: 'none', userSelect: 'none' }}
       />
       {showPreloader && <Preloader onComplete={handlePreloaderComplete} />}
       <div className={`transition-opacity duration-1000 ${
         showPreloader ? 'opacity-0' : 'opacity-100'
-      }`}>
+  } pt-12 sm:pt-0`}>
         <HeroSection 
           onAccreditedClick={handleAccreditedClick}
           onTrailerClick={handleTrailerClick}
