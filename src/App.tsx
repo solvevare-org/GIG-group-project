@@ -1,4 +1,6 @@
 import  {useState} from 'react';
+import { Routes, Route } from 'react-router-dom';
+import CheckoutPage from './pages/CheckoutPage';
 import Preloader from './components/Preloader';
 import AccreditationModal from './components/AccreditationModal';
 import PressSection from './components/PressSection';
@@ -15,10 +17,10 @@ import TestimonialsSection from './components/TestimonialsSection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 
-function App() {
+function Home() {
   const [showPreloader, setShowPreloader] = useState(true);
   const [showAccreditationModal, setShowAccreditationModal] = useState(false);
-  const [showTrailerModal, setShowTrailerModal] = useState(false);
+  const [, setShowTrailerModal] = useState(false);
 
   const handlePreloaderComplete = () => {
     setShowPreloader(false);
@@ -29,9 +31,8 @@ function App() {
   };
 
   const handleAccreditationConfirm = () => {
-    // Here you would implement the actual portal access logic
-    // For now, we'll just redirect to a placeholder
-    window.open('_blank');
+    // Now verification flow in modal performs redirect to /checkout on success.
+    setShowAccreditationModal(false);
   };
 
   const handleTrailerClick = () => {
@@ -68,6 +69,15 @@ function App() {
         onConfirm={handleAccreditationConfirm}
       />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+    </Routes>
   );
 }
 
