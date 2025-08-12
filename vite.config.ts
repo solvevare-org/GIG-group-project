@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
   // Load env and allow optional VITE_API_URL to override backend URL in dev
   const env = loadEnv(mode, process.cwd(), '');
-  const target = env.VITE_API_URL || 'http://localhost:5000';
+  const target = env.VITE_API_URL || 'http://31.97.41.27:8001';
   const useHttps = env.VITE_DEV_HTTPS === 'true';
   const httpsOption = useHttps
     ? (env.VITE_DEV_SSL_CERT && env.VITE_DEV_SSL_KEY
