@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { apiFetch } from '../lib/api';
 
 const ensureAcceptJs = async (env: string) => {
   if ((window as any).Accept) return;
@@ -137,7 +138,7 @@ const CheckoutPage: React.FC = () => {
             return;
           }
           try {
-            const payRes = await fetch('/api/charge-payment', {
+            const payRes = await apiFetch('/api/charge-payment', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

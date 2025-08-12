@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiFetch } from '../lib/api';
 import { Shield, X, CheckCircle } from 'lucide-react';
 
 interface AccreditationModalProps {
@@ -19,7 +20,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
   const sendVerificationCode = async () => {
     setStatus('Sending code...');
     try {
-      const res = await fetch('/api/send-verification-code', {
+  const res = await apiFetch('/api/send-verification-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -37,7 +38,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
     setVerifying(true);
     setStatus('Verifying...');
     try {
-      const res = await fetch('/api/verify-code', {
+  const res = await apiFetch('/api/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code })
