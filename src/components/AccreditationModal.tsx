@@ -47,7 +47,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
       setStatus(data.message || '');
       if (res.ok) {
         // Redirect to checkout with prefilled data
-        const qs = new URLSearchParams({ email, name }).toString();
+        const qs = new URLSearchParams({ email, name, token: data.token || '' }).toString();
         window.location.href = `/checkout?${qs}`;
       }
     } catch (e) {

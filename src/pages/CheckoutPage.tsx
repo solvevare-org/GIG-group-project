@@ -25,13 +25,14 @@ const CheckoutPage: React.FC = () => {
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
   const [email, setEmail] = useState(params.get('email') || '');
   const initialName = params.get('name') || '';
+  const [token] = useState(params.get('token') || '');
   const [firstName, setFirstName] = useState(initialName.split(' ')[0] || '');
   const [lastName, setLastName] = useState(initialName.split(' ').slice(1).join(' ') || '');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [zip, setZip] = useState('');
-  const [country, setCountry] = useState('US');
+  const [country, setCountry] = useState('USA');
   const [amount, setAmount] = useState('');
 
   const [cardNumber, setCardNumber] = useState('');
@@ -50,6 +51,28 @@ const CheckoutPage: React.FC = () => {
     if (location.protocol !== 'https:') {
       setStatus('Checkout requires HTTPS to load payment library.');
     }
+    // Require verified email to access
+    const doCheck = async () => {
+      const e = (email || '').trim();
+      if (!e || !token) {
+        addToast('Access missing. Redirecting...', 'error');
+        setTimeout(() => { window.location.href = '/'; }, 1000);
+        return;
+      }
+      try {
+        const res = await apiFetch(`/api/verify-checkout-token?token=${encodeURIComponent(token)}`);
+        if (!res.ok) throw new Error('check failed');
+        const data = await res.json();
+        if (!data.valid || data.email !== e) {
+          addToast('Please verify your email first.', 'error');
+          setTimeout(() => { window.location.href = '/'; }, 1200);
+        }
+      } catch {
+        addToast('Unable to verify access. Redirecting...', 'error');
+        setTimeout(() => { window.location.href = '/'; }, 1200);
+      }
+    };
+    doCheck();
   }, []);
 
   const addToast = (message: string, type: Toast['type'] = 'info') => {
@@ -138,11 +161,11 @@ const CheckoutPage: React.FC = () => {
             return;
           }
           try {
-            const payRes = await apiFetch('/api/charge-payment', {
+      const payRes = await apiFetch('/api/charge-payment', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                email,
+        token,
                 amount: amount ? Number(amount) : undefined,
                 opaqueData: { dataDescriptor: opaqueData.dataDescriptor, dataValue: opaqueData.dataValue },
                 billing: { firstName, lastName, address, city, state, zip, country },
@@ -152,6 +175,8 @@ const CheckoutPage: React.FC = () => {
             if (payRes.ok && data.ok) {
               setStatus('Payment successful');
               addToast('Payment successful', 'success');
+              // Redirect to landing page after brief success toast
+              setTimeout(() => { window.location.href = '/'; }, 1500);
               resolve();
             } else {
               setStatus(data.message || 'Payment failed');
