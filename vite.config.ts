@@ -20,6 +20,8 @@ export default defineConfig(({ mode }) => {
       exclude: ['lucide-react'],
     },
     server: {
+  host: true, // bind to 0.0.0.0 so it's reachable via the server IP
+  port: 8002,
   https: httpsOption as any,
       proxy: {
         '/api': {
