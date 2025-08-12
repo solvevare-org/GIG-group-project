@@ -1,8 +1,6 @@
 import  {useState} from 'react';
-import logo from './assets/IMG-8086.png';
 import Preloader from './components/Preloader';
 import AccreditationModal from './components/AccreditationModal';
-import TrailerModal from './components/TrailerModal';
 import PressSection from './components/PressSection';
 import FounderStorySection from './components/FounderStorySection';
 import CountdownSection from './components/CountdownSection';
@@ -68,11 +66,6 @@ function App() {
         isOpen={showAccreditationModal}
         onClose={() => setShowAccreditationModal(false)}
         onConfirm={handleAccreditationConfirm}
-      />
-
-      <TrailerModal
-        isOpen={showTrailerModal}
-        onClose={() => setShowTrailerModal(false)}
       />
     </div>
   );
