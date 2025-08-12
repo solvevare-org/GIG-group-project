@@ -1,4 +1,7 @@
-const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/?$/, '');
+// Normalize base URL: ensure scheme so calls don't become relative to the frontend origin
+const rawBase = import.meta.env.VITE_API_URL || '';
+const baseWithScheme = rawBase && !/^https?:\/\//i.test(rawBase) ? `${rawBase}` : rawBase;
+const apiBase = baseWithScheme.replace(/\/?$/, '');
 
 export function apiFetch(input: string, init?: RequestInit) {
   // If input is absolute (http/https), don't prefix
