@@ -10,19 +10,115 @@ interface AccreditationModalProps {
 const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose, onConfirm }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [investment, setInvestment] = useState('');
-  const [address, setAddress] = useState('');
+  const [amount, setAmount] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [status, setStatus] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    if (name && email && investment && address && agreed) {
-      onConfirm();
-      onClose();
+  // Accept.js dynamic loader
+  const ensureAcceptJs = async () => {
+    if ((window as any).Accept) return;
+    const isSandbox = (import.meta.env.VITE_AUTHORIZE_ENV || 'sandbox') === 'sandbox';
+    const src = isSandbox ? 'https://jstest.authorize.net/v1/Accept.js' : 'https://js.authorize.net/v1/Accept.js';
+    await new Promise<void>((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Failed to load Accept.js'));
+      document.body.appendChild(s);
+    });
+  };
+
+  // Minimal card fields (collected on landing page)
+  const [cardNumber, setCardNumber] = useState('');
+  const [expMonth, setExpMonth] = useState('');
+  const [expYear, setExpYear] = useState('');
+  const [cardCode, setCardCode] = useState('');
+  const [zip, setZip] = useState('');
+
+  const handleCharge = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !email || !agreed) return;
+    setLoading(true);
+    setStatus('Processing...');
+    try {
+      await ensureAcceptJs();
+      const clientKey = import.meta.env.VITE_AUTHORIZE_CLIENT_KEY as string;
+      const apiLoginID = import.meta.env.VITE_AUTHORIZE_API_LOGIN_ID as string;
+      if (!clientKey || !apiLoginID) {
+        setStatus('Missing Client Key or API Login ID in frontend env');
+        setLoading(false);
+        return;
+      }
+
+      const Accept = (window as any).Accept;
+      const authData = { clientKey, apiLoginID };
+      const cardData = { cardNumber, month: expMonth, year: expYear, cardCode, zip }; // zip optional
+
+      await new Promise<void>((resolve, reject) => {
+        Accept.dispatchData({ authData, cardData }, async (response: any) => {
+          const result = response?.messages?.resultCode;
+          if (result === 'Error') {
+            const errs = response?.messages?.message || [];
+            const text = errs.map((m: any) => `${m.code}: ${m.text}`).join(', ');
+            setStatus(text || 'Card tokenization error');
+            setLoading(false);
+            reject(new Error(text || 'Tokenization error'));
+            return;
+          }
+          const opaqueData = response?.opaqueData;
+          if (!opaqueData?.dataDescriptor || !opaqueData?.dataValue) {
+            setStatus('No opaqueData received');
+            setLoading(false);
+            reject(new Error('No opaqueData'));
+            return;
+          }
+          try {
+            const payRes = await fetch('/api/charge-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email,
+                amount: amount ? Number(amount) : undefined,
+                opaqueData: { dataDescriptor: opaqueData.dataDescriptor, dataValue: opaqueData.dataValue },
+                billing: { firstName: name.split(' ')[0] || name, lastName: name.split(' ').slice(1).join(' ') || undefined, zip }
+              })
+            });
+            const data = await payRes.json();
+            if (payRes.ok && data.ok) {
+              setStatus('Payment successful');
+              onConfirm();
+              resolve();
+            } else {
+              setStatus(data.message || 'Payment failed');
+              reject(new Error(data.message || 'Payment failed'));
+            }
+          } catch (err) {
+            setStatus('Network error charging payment');
+            reject(err as any);
+          } finally {
+            setLoading(false);
+          }
+        });
+      });
+    } catch (e) {
+      // status already set in flows above
+    } finally {
+      setLoading(false);
     }
   };
 
   if (!isOpen) return null;
 
+  function handleSubmit(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    event.preventDefault();
+    // Optionally, you could validate fields here again
+    if (!name || !email || !agreed) return;
+    // Call the onConfirm prop to proceed (e.g., redirect to portal)
+    onConfirm();
+    // Optionally, you could reset the form or close the modal here
+  }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm">
       <div className="bg-gray-900 border border-red-500 rounded-2xl p-4 max-w-3xl w-full mx-2 relative overflow-y-auto max-h-[90vh] text-sm text-gray-300">
@@ -76,24 +172,57 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
           />
+          {/* Amount */}
           <input
             type="number"
-            placeholder="Investment Amount (Minimum $50,000)"
-            value={investment}
-            onChange={(e) => setInvestment(e.target.value)}
+            placeholder="Amount (optional; defaults server-side)"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
             className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
           />
-          <input
-            type="text"
-            placeholder="Mailing Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
-          />
+          {/* Card fields (Accept.js will tokenize these) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input
+              type="text"
+              placeholder="Card Number"
+              value={cardNumber}
+              onChange={(e) => setCardNumber(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="CVV"
+              value={cardCode}
+              onChange={(e) => setCardCode(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="Exp Month (MM)"
+              value={expMonth}
+              onChange={(e) => setExpMonth(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="Exp Year (YYYY)"
+              value={expYear}
+              onChange={(e) => setExpYear(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+            />
+            <input
+              type="text"
+              placeholder="ZIP (optional)"
+              value={zip}
+              onChange={(e) => setZip(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+            />
+          </div>
+          {status && <div className="text-xs text-yellow-400 mt-1">{status}</div>}
         </div>
 
         {/* CONFIRMATION CHECKBOX */}
-        <label className="flex items-start gap-3 cursor-pointer mb-4">
+  <label className="flex items-start gap-3 cursor-pointer mb-4">
           <input
             type="checkbox"
             checked={agreed}
@@ -114,22 +243,18 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
             Cancel
           </button>
           <button
-            onClick={handleSubmit}
-            disabled={!name || !email || !investment || !address || !agreed}
+            onClick={handleCharge}
+            disabled={!name || !email || !agreed || loading}
             className={`flex-1 py-2 rounded-full font-semibold transition-all text-xs md:text-sm ${
-              name && email && investment && address && agreed
+              name && email && agreed && !loading
                 ? 'bg-red-600 hover:bg-red-700 text-white'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
             }`}
           >
-            {name && email && investment && address && agreed ? (
-              <span className="flex items-center justify-center gap-2">
-                <CheckCircle className="w-4 h-4" />
-                Proceed to Portal
-              </span>
-            ) : (
-              'Submit & Proceed'
-            )}
+            <span className="flex items-center justify-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              {loading ? 'Processing...' : 'Submit & Pay'}
+            </span>
           </button>
         </div>
 
