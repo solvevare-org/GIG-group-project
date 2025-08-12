@@ -1,12 +1,11 @@
-// Normalize base URL: ensure scheme so calls don't become relative to the frontend origin
-const rawBase = import.meta.env.VITE_API_URL || '';
-const baseWithScheme = rawBase && !/^https?:\/\//i.test(rawBase) ? `http://${rawBase}` : rawBase;
-const apiBase = baseWithScheme.replace(/\/?$/, '');
+// Hard-coded backend base URL
+const FORCED_BASE = 'http://31.97.41.27:8001';
+const apiBase = FORCED_BASE.replace(/\/?$/, '');
 
 // If the page is HTTPS and apiBase is HTTP, prefer same-origin (to be rewritten/proxied by the host)
 function resolveBase(): string {
   try {
-    if (typeof window !== 'undefined' && window.location?.protocol === 'https:' && /^http:\/\//i.test(apiBase)) {
+  if (typeof window !== 'undefined' && window.location?.protocol === 'https:' && /^http:\/\//i.test(apiBase)) {
       return '';
     }
   } catch {}
