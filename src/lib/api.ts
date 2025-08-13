@@ -1,5 +1,5 @@
 // Hard-coded backend base URL
-const FORCED_BASE = 'http://31.97.41.27:8001';
+const FORCED_BASE = 'https://backend.vire-s.com';
 const apiBase = FORCED_BASE.replace(/\/?$/, '');
 
 // If the page is HTTPS and apiBase is HTTP, prefer same-origin (to be rewritten/proxied by the host)
