@@ -15,6 +15,14 @@ const ensureAcceptJs = async (env: string) => {
   });
 };
 
+const waitForAccept = async (tries = 20, delayMs = 50) => {
+  for (let i = 0; i < tries; i++) {
+    if ((window as any).Accept?.dispatchData) return true;
+    await new Promise(r => setTimeout(r, delayMs));
+  }
+  return false;
+};
+
 const digitsOnly = (v: string) => v.replace(/\D+/g, '');
 const formatCardNumber = (v: string) => digitsOnly(v).slice(0, 19).replace(/(\d{4})(?=\d)/g, '$1 ').trim();
 const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
@@ -33,7 +41,12 @@ const CheckoutPage: React.FC = () => {
   const [state, setState] = useState('');
   const [zip, setZip] = useState('');
   const [country, setCountry] = useState('USA');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState('50000');
+  const amountOptions = useMemo(() => {
+    const opts: number[] = [];
+    for (let v = 50000; v <= 2000000; v += 50000) opts.push(v);
+    return opts;
+  }, []);
 
   const [cardNumber, setCardNumber] = useState('');
   const [expMonth, setExpMonth] = useState('');
@@ -44,6 +57,7 @@ const CheckoutPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [acceptReady, setAcceptReady] = useState(false);
 
   const env = import.meta.env.VITE_AUTHORIZE_ENV || 'sandbox';
 
@@ -73,6 +87,20 @@ const CheckoutPage: React.FC = () => {
       }
     };
     doCheck();
+    // Preload Accept.js so it's ready on first click
+    const preload = async () => {
+      if (location.protocol !== 'https:') { setAcceptReady(false); return; }
+      try {
+        await ensureAcceptJs(env);
+        const ok = await waitForAccept();
+        setAcceptReady(ok);
+        if (!ok) setStatus('Payment library is initializing. Please wait...');
+      } catch (e) {
+        setAcceptReady(false);
+        setStatus('Failed to load payment library. Please refresh and try again.');
+      }
+    };
+    preload();
   }, []);
 
   const addToast = (message: string, type: Toast['type'] = 'info') => {
@@ -121,7 +149,15 @@ const CheckoutPage: React.FC = () => {
     setStatus('Processing...');
     setLoading(true);
     try {
+      // Ensure payment library is loaded and ready
       await ensureAcceptJs(env);
+      const ready = await waitForAccept();
+      if (!ready) {
+        setStatus('Payment library is still loading. Please try again in a moment.');
+        addToast('Payment library is still loading. Please try again.', 'error');
+        setLoading(false);
+        return;
+      }
       const clientKey = import.meta.env.VITE_AUTHORIZE_CLIENT_KEY as string;
       const apiLoginID = import.meta.env.VITE_AUTHORIZE_API_LOGIN_ID as string;
       if (!clientKey || !apiLoginID) {
@@ -239,7 +275,16 @@ const CheckoutPage: React.FC = () => {
           </div>
           <input className="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full" placeholder="Country" value={country} onChange={e=>setCountry(e.target.value)} />
           <div>
-            <input className={`bg-gray-800 border ${errors.amount ? 'border-red-500' : 'border-gray-700'} rounded px-3 py-2 w-full`} placeholder="Amount (optional; defaults server-side)" value={amount} onChange={e=>setAmount(e.target.value)} onBlur={validate} />
+            <select
+              className={`bg-gray-800 border ${errors.amount ? 'border-red-500' : 'border-gray-700'} rounded px-3 py-2 w-full`}
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              onBlur={validate}
+            >
+              {amountOptions.map(v => (
+                <option key={v} value={v}>{v.toLocaleString()}</option>
+              ))}
+            </select>
             {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
           </div>
 
@@ -254,12 +299,25 @@ const CheckoutPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <input className={`bg-gray-800 border ${errors.expMonth ? 'border-red-500' : 'border-gray-700'} rounded px-3 py-2 w-full`} placeholder="Exp Month (MM)" value={expMonth} onChange={e=>{
-                  const raw = digitsOnly(e.target.value).slice(0,2);
-                  if (raw.length === 0) { setExpMonth(''); return; }
-                  const n = clamp(Number(raw), 1, 12);
-                  setExpMonth(n.toString().padStart(2, '0'));
-                }} onBlur={validate} inputMode="numeric" />
+                <input
+                  className={`bg-gray-800 border ${errors.expMonth ? 'border-red-500' : 'border-gray-700'} rounded px-3 py-2 w-full`}
+                  placeholder="Exp Month (MM)"
+                  value={expMonth}
+                  onChange={e => {
+                    const raw = digitsOnly(e.target.value).slice(0, 2);
+                    setExpMonth(raw);
+                  }}
+                  onBlur={() => {
+                    const raw = digitsOnly(expMonth);
+                    if (!raw) { setExpMonth(''); validate(); return; }
+                    const n = Number(raw);
+                    if (Number.isFinite(n) && n >= 1 && n <= 12) {
+                      setExpMonth(n.toString().padStart(2, '0'));
+                    }
+                    validate();
+                  }}
+                  inputMode="numeric"
+                />
                 {errors.expMonth && <p className="text-red-500 text-xs mt-1">{errors.expMonth}</p>}
               </div>
               <div>
@@ -269,8 +327,8 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
-          <button disabled={loading} className={`w-full mt-2 py-2 rounded ${loading ? 'bg-gray-600' : 'bg-red-600 hover:bg-red-700'} font-semibold`}>
-            {loading ? 'Processing...' : 'Pay Now'}
+          <button disabled={loading || !acceptReady} className={`w-full mt-2 py-2 rounded ${loading || !acceptReady ? 'bg-gray-600' : 'bg-red-600 hover:bg-red-700'} font-semibold`}>
+            {loading ? 'Processing...' : acceptReady ? 'Pay Now' : 'Loading Payment...'}
           </button>
         </form>
       </div>
