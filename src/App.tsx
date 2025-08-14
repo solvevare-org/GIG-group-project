@@ -30,10 +30,7 @@ function Home() {
     setShowAccreditationModal(true);
   };
 
-  const handleAccreditationConfirm = () => {
-    // Now verification flow in modal performs redirect to /checkout on success.
-    setShowAccreditationModal(false);
-  };
+  // Removed unused accreditation confirm handler; modal handles redirect internally.
 
   const handleTrailerClick = () => {
     setShowTrailerModal(true);
@@ -66,7 +63,6 @@ function Home() {
       <AccreditationModal
         isOpen={showAccreditationModal}
         onClose={() => setShowAccreditationModal(false)}
-        onConfirm={handleAccreditationConfirm}
       />
     </div>
   );

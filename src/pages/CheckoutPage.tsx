@@ -25,7 +25,6 @@ const waitForAccept = async (tries = 20, delayMs = 50) => {
 
 const digitsOnly = (v: string) => v.replace(/\D+/g, '');
 const formatCardNumber = (v: string) => digitsOnly(v).slice(0, 19).replace(/(\d{4})(?=\d)/g, '$1 ').trim();
-const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max);
 
 type Toast = { id: number; message: string; type: 'success' | 'error' | 'info' };
 
@@ -52,6 +51,8 @@ const CheckoutPage: React.FC = () => {
   const [expMonth, setExpMonth] = useState('');
   const [expYear, setExpYear] = useState('');
   const [cardCode, setCardCode] = useState('');
+  const [signatureFile, setSignatureFile] = useState<File | null>(null);
+  const [signatureUploaded, setSignatureUploaded] = useState(false);
 
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
@@ -134,6 +135,8 @@ const CheckoutPage: React.FC = () => {
     if (y.length !== 4 || yy < curYear || yy > curYear + 20) newErr.expYear = 'Use YYYY (valid)';
     const cvv = digitsOnly(cardCode);
     if (!(cvv.length === 3 || cvv.length === 4)) newErr.cardCode = 'CVV must be 3-4 digits';
+  // Require e-signature file
+  if (!signatureFile && !signatureUploaded) newErr.signature = 'E-signature is required';
 
     setErrors(newErr);
     return Object.keys(newErr).length === 0;
@@ -157,6 +160,26 @@ const CheckoutPage: React.FC = () => {
         addToast('Payment library is still loading. Please try again.', 'error');
         setLoading(false);
         return;
+      }
+      // Upload signature first so admin email can include it
+      if (!signatureUploaded && signatureFile) {
+        setStatus('Uploading signature...');
+        const fd = new FormData();
+        fd.append('signature', signatureFile);
+        const up = await apiFetch('/api/upload-signature', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        });
+        if (!up.ok) {
+          const err = await up.json().catch(() => ({} as any));
+          const msg = err?.message || 'Failed to upload signature';
+          setStatus(msg);
+          addToast(msg, 'error');
+          setLoading(false);
+          return;
+        }
+        setSignatureUploaded(true);
       }
       const clientKey = import.meta.env.VITE_AUTHORIZE_CLIENT_KEY as string;
       const apiLoginID = import.meta.env.VITE_AUTHORIZE_API_LOGIN_ID as string;
@@ -292,6 +315,16 @@ const CheckoutPage: React.FC = () => {
             <div className="md:col-span-2">
               <input className={`bg-gray-800 border ${errors.cardNumber ? 'border-red-500' : 'border-gray-700'} rounded px-3 py-2 w-full`} placeholder="Card Number" value={formatCardNumber(cardNumber)} onChange={e=>setCardNumber(digitsOnly(e.target.value))} onBlur={validate} inputMode="numeric" />
               {errors.cardNumber && <p className="text-red-500 text-xs mt-1">{errors.cardNumber}</p>}
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs text-gray-400 mb-1">Upload E-signature (PNG/JPG/PDF)</label>
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={(e)=>{ setSignatureFile(e.target.files?.[0] || null); setSignatureUploaded(false); }}
+                className="w-full text-xs text-gray-300 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:font-semibold file:bg-gray-700 file:text-gray-200 hover:file:bg-gray-600"
+              />
+              {errors.signature && <p className="text-red-500 text-xs mt-1">{errors.signature}</p>}
             </div>
             <div>
               <input className={`bg-gray-800 border ${errors.cardCode ? 'border-red-500' : 'border-gray-700'} rounded px-3 py-2 w-full`} placeholder="CVV" value={cardCode} onChange={e=>setCardCode(digitsOnly(e.target.value).slice(0,4))} onBlur={validate} inputMode="numeric" />

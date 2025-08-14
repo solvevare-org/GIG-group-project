@@ -5,10 +5,9 @@ import { Shield, X, CheckCircle } from 'lucide-react';
 interface AccreditationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void; // Should handle redirection outside
 }
 
-const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose, onConfirm }) => {
+const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [agreed, setAgreed] = useState(false);
@@ -17,7 +16,6 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
   const [code, setCode] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
-  const [signatureFile, setSignatureFile] = useState<File | null>(null);
 
   const sendVerificationCode = async () => {
     setStatus('Sending code...');
@@ -29,7 +27,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
       });
       const data = await res.json();
       setStatus(data.message || '');
-      if (res.ok) setCodeSent(true);
+  if (res.ok) setCodeSent(true);
     } catch (e) {
       setStatus('Network error sending code');
     }
@@ -47,24 +45,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
       const data = await res.json();
       setStatus(data.message || '');
       if (res.ok) {
-        // If we have a signature file, upload it with the token before redirecting
-        const token = data.token || '';
-        if (signatureFile && token) {
-          setStatus('Uploading signature...');
-          const fd = new FormData();
-          fd.append('signature', signatureFile);
-          const up = await apiFetch('/api/upload-signature', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
-            body: fd,
-          });
-          if (!up.ok) {
-            const err = await up.json().catch(() => ({} as any));
-            setStatus(err.message || 'Failed to upload signature');
-            setVerifying(false);
-            return;
-          }
-        }
+  const token = data.token || '';
         const qs = new URLSearchParams({ email, name, token }).toString();
         window.location.href = `/checkout?${qs}`;
       }
@@ -87,7 +68,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
 
   const primaryLabel = !codeSent ? (verifying ? 'Sending...' : 'Send Verification Code') : (verifying ? 'Verifying...' : 'Verify');
   const primaryDisabled = !codeSent
-    ? (!hasScrolledToEnd || !signatureFile || !name || !email || !agreed || verifying)
+    ? (!hasScrolledToEnd || !name || !email || !agreed || verifying)
     : (!code || verifying);
   const handlePrimaryAction = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -143,21 +124,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
   {/* FORM FIELDS */}
         {hasScrolledToEnd && (
         <div className="space-y-3 mb-4">
-          {/* E-Signature upload */}
-          <div className="space-y-1">
-            <label className="block text-xs text-gray-400">Upload E-signature (PNG/JPG/PDF)</label>
-            <input
-              type="file"
-              accept="image/*,application/pdf"
-              onChange={(e) => setSignatureFile(e.target.files?.[0] || null)}
-              className="w-full text-xs text-gray-300 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-gray-700 file:text-gray-200 hover:file:bg-gray-600"
-            />
-            {signatureFile && (
-              <div className="text-xs text-green-400 flex items-center gap-1">
-                <CheckCircle className="w-3 h-3" /> {signatureFile.name}
-              </div>
-            )}
-          </div>
+          {/* E-Signature upload moved to Checkout page */}
           <input
             type="text"
             placeholder="Full Name"
