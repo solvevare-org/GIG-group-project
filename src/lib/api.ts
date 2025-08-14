@@ -1,5 +1,5 @@
 // Hard-coded backend base URL
-const FORCED_BASE = 'https://backend.vire-s.com';
+const FORCED_BASE = 'http://localhost:8001'; // for testing
 const apiBase = FORCED_BASE.replace(/\/?$/, '');
 
 // If the page is HTTPS and apiBase is HTTP, prefer same-origin (to be rewritten/proxied by the host)

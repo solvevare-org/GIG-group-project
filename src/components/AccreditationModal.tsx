@@ -16,11 +16,13 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
   const [codeSent, setCodeSent] = useState(false);
   const [code, setCode] = useState('');
   const [verifying, setVerifying] = useState(false);
+  const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
+  const [signatureFile, setSignatureFile] = useState<File | null>(null);
 
   const sendVerificationCode = async () => {
     setStatus('Sending code...');
     try {
-  const res = await apiFetch('/api/send-verification-code', {
+      const res = await apiFetch('/api/send-verification-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -33,12 +35,11 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
     }
   };
 
-  const verifyCode = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const verifyCodeAction = async () => {
     setVerifying(true);
     setStatus('Verifying...');
     try {
-  const res = await apiFetch('/api/verify-code', {
+      const res = await apiFetch('/api/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code })
@@ -46,8 +47,25 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
       const data = await res.json();
       setStatus(data.message || '');
       if (res.ok) {
-        // Redirect to checkout with prefilled data
-        const qs = new URLSearchParams({ email, name, token: data.token || '' }).toString();
+        // If we have a signature file, upload it with the token before redirecting
+        const token = data.token || '';
+        if (signatureFile && token) {
+          setStatus('Uploading signature...');
+          const fd = new FormData();
+          fd.append('signature', signatureFile);
+          const up = await apiFetch('/api/upload-signature', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: fd,
+          });
+          if (!up.ok) {
+            const err = await up.json().catch(() => ({} as any));
+            setStatus(err.message || 'Failed to upload signature');
+            setVerifying(false);
+            return;
+          }
+        }
+        const qs = new URLSearchParams({ email, name, token }).toString();
         window.location.href = `/checkout?${qs}`;
       }
     } catch (e) {
@@ -57,16 +75,25 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
     }
   };
 
+  const handleTermsScroll: React.UIEventHandler<HTMLDivElement> = (e) => {
+    const el = e.currentTarget;
+    // Consider near-bottom as complete to avoid off-by-one issues
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 8) {
+      setHasScrolledToEnd(true);
+    }
+  };
+
   if (!isOpen) return null;
 
-  function handleSubmit(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    event.preventDefault();
-    // Optionally, you could validate fields here again
-    if (!name || !email || !agreed) return;
-    // Call the onConfirm prop to proceed (e.g., redirect to portal)
-    onConfirm();
-    // Optionally, you could reset the form or close the modal here
-  }
+  const primaryLabel = !codeSent ? (verifying ? 'Sending...' : 'Send Verification Code') : (verifying ? 'Verifying...' : 'Verify');
+  const primaryDisabled = !codeSent
+    ? (!hasScrolledToEnd || !signatureFile || !name || !email || !agreed || verifying)
+    : (!code || verifying);
+  const handlePrimaryAction = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!codeSent) return sendVerificationCode();
+    return verifyCodeAction();
+  };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm">
       <div className="bg-gray-900 border border-red-500 rounded-2xl p-4 max-w-3xl w-full mx-2 relative overflow-y-auto max-h-[90vh] text-sm text-gray-300">
@@ -88,7 +115,10 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
         </div>
 
         {/* SCROLLABLE TERM SHEET */}
-        <div className="bg-gray-800 rounded-xl p-4 mb-4 max-h-60 overflow-y-scroll space-y-2 text-xs md:text-sm leading-relaxed">
+        <div
+          className="bg-gray-800 rounded-xl p-4 mb-4 max-h-60 overflow-y-scroll space-y-2 text-xs md:text-sm leading-relaxed"
+          onScroll={handleTermsScroll}
+        >
           <p>This letter sets forth terms of understanding between [INVESTOR], an [individual or company], and No Right Way Productions LLC (the “Company”) for investing in the film “No Right Way”.</p>
           <p><strong>1. Scope:</strong> The Company is formed for financing and producing the film. It is managed by Terrence Gallman, who holds all creative and business rights.</p>
           <p><strong>2. Investment:</strong> Minimum $50,000, non-secured, non-recourse, applied toward the $21.6M budget for development, production, and marketing.</p>
@@ -104,8 +134,30 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
           <p><strong>12. Governing Law:</strong> This agreement is governed by New York law. All disputes will be settled in New York courts.</p>
         </div>
 
-        {/* FORM FIELDS */}
+        {!hasScrolledToEnd && (
+          <div className="text-xs text-yellow-400 mb-3">
+            Please scroll to the bottom of the agreement to unlock the form fields.
+          </div>
+        )}
+
+  {/* FORM FIELDS */}
+        {hasScrolledToEnd && (
         <div className="space-y-3 mb-4">
+          {/* E-Signature upload */}
+          <div className="space-y-1">
+            <label className="block text-xs text-gray-400">Upload E-signature (PNG/JPG/PDF)</label>
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              onChange={(e) => setSignatureFile(e.target.files?.[0] || null)}
+              className="w-full text-xs text-gray-300 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-gray-700 file:text-gray-200 hover:file:bg-gray-600"
+            />
+            {signatureFile && (
+              <div className="text-xs text-green-400 flex items-center gap-1">
+                <CheckCircle className="w-3 h-3" /> {signatureFile.name}
+              </div>
+            )}
+          </div>
           <input
             type="text"
             placeholder="Full Name"
@@ -120,35 +172,21 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
           />
-          {/* Email verification */}
-          <div className="flex gap-2 items-center">
-            <button
-              type="button"
-              onClick={sendVerificationCode}
-              disabled={!email || codeSent}
-              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
-            >
-              {codeSent ? 'Code Sent' : 'Send Verification Code'}
-            </button>
-            {codeSent && (
-              <form onSubmit={verifyCode} className="flex gap-2 items-center">
-                <input
-                  type="text"
-                  placeholder="Enter Code"
-                  value={code}
-                  onChange={e => setCode(e.target.value)}
-                  className="px-2 py-1 rounded bg-gray-700 border border-gray-600 text-white text-xs"
-                />
-                <button
-                  type="submit"
-                  disabled={!code || verifying}
-                  className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs"
-                >Verify</button>
-              </form>
-            )}
-          </div>
+          {/* Verification code input appears after sending code */}
+          {codeSent && (
+            <div className="flex gap-2 items-center">
+              <input
+                type="text"
+                placeholder="Enter Code"
+                value={code}
+                onChange={e => setCode(e.target.value)}
+                className="flex-1 px-2 py-2 rounded bg-gray-700 border border-gray-600 text-white text-xs"
+              />
+            </div>
+          )}
           {status && <div className="text-xs text-yellow-400 mt-1">{status}</div>}
         </div>
+        )}
 
         {/* CONFIRMATION CHECKBOX */}
   <label className="flex items-start gap-3 cursor-pointer mb-4">
@@ -172,17 +210,17 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
             Cancel
           </button>
           <button
-            onClick={handleSubmit}
-            disabled={!name || !email || !agreed}
+            onClick={handlePrimaryAction}
+            disabled={primaryDisabled}
             className={`flex-1 py-2 rounded-full font-semibold transition-all text-xs md:text-sm ${
-              name && email && agreed
+              !primaryDisabled
                 ? 'bg-red-600 hover:bg-red-700 text-white'
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed'
             }`}
           >
             <span className="flex items-center justify-center gap-2">
               <CheckCircle className="w-4 h-4" />
-              Continue
+              {primaryLabel}
             </span>
           </button>
         </div>
