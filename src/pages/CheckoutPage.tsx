@@ -304,6 +304,7 @@ const CheckoutPage: React.FC = () => {
               onChange={e => setAmount(e.target.value)}
               onBlur={validate}
             >
+              <option value={10}>10</option>
               {amountOptions.map(v => (
                 <option key={v} value={v}>{v.toLocaleString()}</option>
               ))}
