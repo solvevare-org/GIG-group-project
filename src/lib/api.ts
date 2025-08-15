@@ -15,8 +15,8 @@ function resolveBase(): string {
 export function apiFetch(input: string, init?: RequestInit) {
   // If input is absolute (http/https), don't prefix
   const isAbsolute = /^https?:\/\//i.test(input);
-  // const base = resolveBase();
-  const base = 'http://localhost:8001'; // testing changes
+  const base = resolveBase();
+  // const base = 'http://localhost:8001'; // testing changes
   const path = isAbsolute ? input : `${base}${input.startsWith('/') ? '' : '/'}${input}`;
   return fetch(path, init);
 }
