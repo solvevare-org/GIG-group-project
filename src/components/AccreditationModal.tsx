@@ -47,14 +47,38 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
     }
     if (investorType === 'company' && (!entityForm || !jurisdiction)) {
       setStatus('Please provide the company type and jurisdiction.');
-      return;
-    }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setStatus('Please provide a valid email address.');
-      return;
-    }
-    if (hasScrolledToEnd && agreed) setStep(1);
-    else setStatus('Please scroll to the end and agree to terms.');
+                    // Build a printable container from the term content (remove dark bg & scroll)
+                    const container = document.createElement('div');
+                    const style = document.createElement('style');
+                    style.textContent = `
+                      .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
+                      .pdf-reset { padding: 16px; font-family: Arial, sans-serif; line-height: 1.4; }
+                      .pdf-reset h1, .pdf-reset h2, .pdf-reset h3 { color: #000 !important; }
+                      .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
+                      .pdf-reset .rounded, .pdf-reset [class*="rounded-"] { border-radius: 0 !important; }
+                      .pdf-reset .max-h-60, .pdf-reset [style*="max-height"] { max-height: none !important; }
+                      .pdf-reset .overflow-y-scroll, .pdf-reset [style*="overflow"] { overflow: visible !important; }
+                      .pdf-page { width: 7.5in; max-width: 7.5in; }
+                      @media print { .page-break { page-break-before: always; } }
+                    `;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'pdf-reset pdf-page';
+                    const clone = termsRef.current.cloneNode(true) as HTMLElement;
+                    clone.style.maxHeight = 'none';
+                    clone.style.overflow = 'visible';
+                    wrapper.appendChild(clone);
+                    container.appendChild(style);
+                    container.appendChild(wrapper);
+
+                    const opt = {
+                      margin: [0.5, 0.5, 0.5, 0.5],
+                      filename: `No-Right-Way-Term-Sheet-${(name||'Investor').replace(/[^a-z0-9\-_. ]/gi,'_')}.pdf`,
+                      pagebreak: { mode: ['css', 'legacy'] },
+                      image: { type: 'jpeg', quality: 0.98 },
+                      html2canvas: { scale: 2, backgroundColor: '#ffffff' },
+                      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                    } as any;
+                    await (html2pdf as any)().set(opt).from(container).save();
   };
 
   // Step 1: Email input
