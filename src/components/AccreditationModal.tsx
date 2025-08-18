@@ -47,43 +47,12 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
     }
     if (investorType === 'company' && (!entityForm || !jurisdiction)) {
       setStatus('Please provide the company type and jurisdiction.');
-                    // Build a printable container from the term content (remove dark bg & scroll)
-                    const container = document.createElement('div');
-                    const style = document.createElement('style');
-                    style.textContent = `
-                      .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
-                      .pdf-reset { padding: 16px; font-family: Arial, sans-serif; line-height: 1.4; }
-                      .pdf-reset h1, .pdf-reset h2, .pdf-reset h3 { color: #000 !important; }
-                      .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
-                      .pdf-reset .rounded, .pdf-reset [class*="rounded-"] { border-radius: 0 !important; }
-                      .pdf-reset .max-h-60, .pdf-reset [style*="max-height"] { max-height: none !important; }
-                      .pdf-reset .overflow-y-scroll, .pdf-reset [style*="overflow"] { overflow: visible !important; }
-                      .pdf-page { width: 7.5in; max-width: 7.5in; }
-                      @media print { .page-break { page-break-before: always; } }
-                    `;
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'pdf-reset pdf-page';
-                    if (!termsRef.current) {
-                      setStatus('Unable to generate PDF: term sheet not found.');
-                      return;
-                    }
-                    const clone = termsRef.current.cloneNode(true) as HTMLElement;
-                    clone.style.maxHeight = 'none';
-                    clone.style.overflow = 'visible';
-                    wrapper.appendChild(clone);
-                    container.appendChild(style);
-                    container.appendChild(wrapper);
-
-                    const opt = {
-                      margin: [0.5, 0.5, 0.5, 0.5],
-                      filename: `No-Right-Way-Term-Sheet-${(name||'Investor').replace(/[^a-z0-9\-_. ]/gi,'_')}.pdf`,
-                      pagebreak: { mode: ['css', 'legacy'] },
-                      image: { type: 'jpeg', quality: 0.98 },
-                      html2canvas: { scale: 2, backgroundColor: '#ffffff' },
-                      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-                    } as any;
-                    await (html2pdf as any)().set(opt).from(container).save();
-    };
+      return;
+    }
+    // Proceed to email verification step
+    setStatus('');
+    setStep(1);
+  };
 
   // Step 1: Email input
   const handleSendCode = async () => {
@@ -343,8 +312,19 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                       margin: [0.5, 0.5, 0.5, 0.5],
                       filename: `No-Right-Way-Term-Sheet-${(name||'Investor').replace(/[^a-z0-9\-_. ]/gi,'_')}.pdf`,
                       image: { type: 'jpeg', quality: 0.98 },
-                      html2canvas: { scale: 2, backgroundColor: '#ffffff' },
-                      pagebreak: { mode: ['css', 'legacy'] },
+                      html2canvas: {
+                        scale: 2,
+                        backgroundColor: '#ffffff',
+                        letterRendering: true,
+                        useCORS: true,
+                        scrollX: 0,
+                        scrollY: 0,
+                      },
+                      // Try to avoid splitting important blocks across pages
+                      pagebreak: {
+                        mode: ['css', 'legacy'],
+                        avoid: ['p', 'li', 'h1', 'h2', 'h3', 'h4']
+                      },
                       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
                     } as any;
                     // Build a printable container overriding dark theme and scroll limits
@@ -352,12 +332,22 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                     const style = document.createElement('style');
                     style.textContent = `
                       .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
-                      .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; }
-                      .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; }
+                      /* Fixed printable width equals Letter width minus margins (8.5in - 1in) */
+                      .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; width: 7.5in; max-width: 7.5in; margin: 0 auto; }
+                      .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; line-height: 1.25; margin: 0 0 8px 0; }
                       .pdf-reset a { color: #000 !important; text-decoration: none; }
+                      .pdf-reset p, .pdf-reset li { line-height: 1.5; margin: 0 0 8px 0; orphans: 2; widows: 2; }
+                      .pdf-reset ol, .pdf-reset ul { padding-left: 20px; }
+                      /* Try to keep blocks together across pages */
+                      .pdf-reset p, .pdf-reset li, .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { page-break-inside: avoid; break-inside: avoid; }
+                      /* Ensure Exhibit NP starts on a fresh page */
+                      .pdf-reset h3 { break-before: page; page-break-before: always; }
                       .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
                       .pdf-reset [class*="max-h-"], .pdf-reset [style*="max-height"] { max-height: none !important; }
                       .pdf-reset [class*="overflow-"], .pdf-reset [style*="overflow"] { overflow: visible !important; }
+                      .pdf-reset .rounded-xl { border-radius: 0 !important; }
+                      .pdf-reset .bg-gray-800 { background: #fff !important; }
+                      .pdf-reset .text-gray-300, .pdf-reset .text-gray-400 { color: #000 !important; }
                     `;
                     const wrapper = document.createElement('div');
                     wrapper.className = 'pdf-reset';
@@ -528,6 +518,5 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
       </div>
     </div>
   );
-};
 };
 export default AccreditationModal;
