@@ -89,8 +89,9 @@ const CheckoutPage: React.FC = () => {
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
       } as any;
 
-      // Generate PDF blob
-      const blob: Blob = await (html2pdf as any)().set(opt).from(container).output('blob');
+  // Generate PDF blob reliably via jsPDF instance
+  const pdf: any = await (html2pdf as any)().set(opt).from(container).toPdf().get('pdf');
+  const blob: Blob = pdf.output('blob');
       // Upload to backend for emailing
       const fd = new FormData();
       fd.append('email', email);
