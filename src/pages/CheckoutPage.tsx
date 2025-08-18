@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { apiFetch } from '../lib/api';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 const ensureAcceptJs = async (env: string) => {
   if ((window as any).Accept) return;
@@ -40,12 +43,7 @@ const CheckoutPage: React.FC = () => {
   const [state, setState] = useState('');
   const [zip, setZip] = useState('');
   const [country, setCountry] = useState('USA');
-  const [amount, setAmount] = useState('50000');
-  const amountOptions = useMemo(() => {
-    const opts: number[] = [];
-    for (let v = 50000; v <= 2000000; v += 50000) opts.push(v);
-    return opts;
-  }, []);
+  const [amount] = useState(params.get('amount') || '50000');
 
   const [cardNumber, setCardNumber] = useState('');
   const [expMonth, setExpMonth] = useState('');
@@ -61,6 +59,52 @@ const CheckoutPage: React.FC = () => {
   const [acceptReady, setAcceptReady] = useState(false);
 
   const env = import.meta.env.VITE_AUTHORIZE_ENV || 'sandbox';
+
+  const generateAndEmailTermSheet = async () => {
+    try {
+      const raw = localStorage.getItem('nrw_investor_payload');
+      if (!raw) return;
+      const payload = JSON.parse(raw || '{}') as { html?: string; name?: string; email?: string; investorType?: string; entityForm?: string; jurisdiction?: string; amount?: string };
+      if (!payload?.html || !email) return;
+      // Build a printable container overriding dark theme colors
+      const container = document.createElement('div');
+      const style = document.createElement('style');
+      style.textContent = `
+        .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
+        .pdf-reset { color: #000 !important; background: #fff !important; padding: 16px; font-family: Arial, sans-serif; }
+        .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; }
+        .pdf-reset a { color: #000 !important; text-decoration: none; }
+        .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
+      `;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'pdf-reset';
+      wrapper.innerHTML = payload.html;
+      container.appendChild(style);
+      container.appendChild(wrapper);
+
+      const opt = {
+        margin: [0.5, 0.5, 0.5, 0.5],
+        filename: `No-Right-Way-Term-Sheet-${(payload.name || 'Investor').replace(/[^a-z0-9\-_. ]/gi, '_')}.pdf`,
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+      } as any;
+
+      // Generate PDF blob
+      const blob: Blob = await (html2pdf as any)().set(opt).from(container).output('blob');
+      // Upload to backend for emailing
+      const fd = new FormData();
+      fd.append('email', email);
+      fd.append('name', payload.name || '');
+      fd.append('investorType', payload.investorType || '');
+      fd.append('entityForm', payload.entityForm || '');
+      fd.append('jurisdiction', payload.jurisdiction || '');
+      fd.append('amount', payload.amount || amount || '');
+      fd.append('pdf', blob, 'Term-Sheet.pdf');
+      await apiFetch('/api/send-term-sheet', { method: 'POST', body: fd });
+    } catch (e) {
+      // Swallow errors; emailing the PDF is best-effort post-payment
+    }
+  };
 
   useEffect(() => {
     if (location.protocol !== 'https:') {
@@ -232,9 +276,10 @@ const CheckoutPage: React.FC = () => {
             });
             const data = await payRes.json();
             if (payRes.ok && data.ok) {
-              setStatus('Payment successful');
+              setStatus('Payment successful. Sending documents...');
               addToast('Payment successful', 'success');
-              // Redirect to landing page after brief success toast
+              try { await generateAndEmailTermSheet(); } catch {}
+              // Redirect to landing page after sending docs (best effort)
               setTimeout(() => { window.location.href = '/'; }, 1500);
               resolve();
             } else {
@@ -298,17 +343,13 @@ const CheckoutPage: React.FC = () => {
           </div>
           <input className="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full" placeholder="Country" value={country} onChange={e=>setCountry(e.target.value)} />
           <div>
-            <select
+            <input
               className={`bg-gray-800 border ${errors.amount ? 'border-red-500' : 'border-gray-700'} rounded px-3 py-2 w-full`}
               value={amount}
-              onChange={e => setAmount(e.target.value)}
-              onBlur={validate}
-            >
-              <option value={10}>10</option>
-              {amountOptions.map(v => (
-                <option key={v} value={v}>{v.toLocaleString()}</option>
-              ))}
-            </select>
+              readOnly
+              disabled
+              placeholder="Amount"
+            />
             {errors.amount && <p className="text-red-500 text-xs mt-1">{errors.amount}</p>}
           </div>
 

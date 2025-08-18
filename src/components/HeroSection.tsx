@@ -65,7 +65,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
         </p> */}
         
         <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-4xl mx-auto leading-relaxed">
-          A disruptive financial education film challenging conventional wisdom. 
+          A disruptive finance drama challenging conventional wisdom. 
           <span className="text-red-400 font-semibold"> There's no single path to success.</span>
         </p>
 
@@ -77,7 +77,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
             <span className="flex items-center justify-center gap-3 w-full">
               <Shield className="w-6 h-6" />
               <span className="block w-full text-center">
-                INSTITUTIONAL AND ACCREDITED INVESTORS ACCESS
+                INSTITUTIONAL AND ACCREDITED INVESTORS ACCESS AND CHECKOUT PORTAL
               </span>
             </span>
           </button>
