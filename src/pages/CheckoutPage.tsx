@@ -70,11 +70,13 @@ const CheckoutPage: React.FC = () => {
       const container = document.createElement('div');
       const style = document.createElement('style');
       style.textContent = `
-        .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
-        .pdf-reset { color: #000 !important; background: #fff !important; padding: 16px; font-family: Arial, sans-serif; }
+        .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
+        .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; }
         .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; }
         .pdf-reset a { color: #000 !important; text-decoration: none; }
         .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
+        .pdf-reset [class*="max-h-"], .pdf-reset [style*="max-height"] { max-height: none !important; }
+        .pdf-reset [class*="overflow-"], .pdf-reset [style*="overflow"] { overflow: visible !important; }
       `;
       const wrapper = document.createElement('div');
       wrapper.className = 'pdf-reset';
@@ -85,7 +87,9 @@ const CheckoutPage: React.FC = () => {
       const opt = {
         margin: [0.5, 0.5, 0.5, 0.5],
         filename: `No-Right-Way-Term-Sheet-${(payload.name || 'Investor').replace(/[^a-z0-9\-_. ]/gi, '_')}.pdf`,
-        html2canvas: { scale: 2 },
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, backgroundColor: '#ffffff' },
+        pagebreak: { mode: ['css', 'legacy'] },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
       } as any;
 
