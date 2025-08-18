@@ -145,15 +145,74 @@ const SubscriptionSection: React.FC = () => {
                   ))}
                 </ul>
 
-                <button className={`w-full py-4 rounded-full font-bold text-lg transition-all duration-300 ${
-                  plan.popular 
-                    ? 'bg-white text-red-600 hover:bg-gray-100' 
-                    : plan.restricted
-                    ? 'bg-yellow-600 text-black hover:bg-yellow-500'
-                    : 'bg-red-600 text-white hover:bg-red-700'
-                }`}>
-                  {plan.cta}
-                </button>
+                {plan.name === 'Insider' ? (
+                  <form
+                    method="post"
+                    action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx"
+                  >
+                    <input type="hidden" name="LinkId" value="90ea3400-9cbf-45b0-81e4-038d0f9c048b" />
+                    <button
+                      type="submit"
+                      className={`w-full py-4 rounded-full font-bold text-lg transition-all duration-300 ${
+                        plan.popular
+                          ? 'bg-white text-red-600 hover:bg-gray-100'
+                          : plan.restricted
+                          ? 'bg-yellow-600 text-black hover:bg-yellow-500'
+                          : 'bg-red-600 text-white hover:bg-red-700'
+                      }`}
+                    >
+                      {plan.cta}
+                    </button>
+                  </form>
+                ) : plan.name === 'Rebel' ? (
+                  <form
+                    method="post"
+                    action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx"
+                  >
+                    <input type="hidden" name="LinkId" value="6ce195d5-06a2-44ac-a180-c05b5176f946" />
+                    <button
+                      type="submit"
+                      className={`w-full py-4 rounded-full font-bold text-lg transition-all duration-300 ${
+                        plan.popular
+                          ? 'bg-white text-red-600 hover:bg-gray-100'
+                          : plan.restricted
+                          ? 'bg-yellow-600 text-black hover:bg-yellow-500'
+                          : 'bg-red-600 text-white hover:bg-red-700'
+                      }`}
+                    >
+                      {plan.cta}
+                    </button>
+                  </form>
+                ) : plan.name === 'Accredited' ? (
+                  <form
+                    method="post"
+                    action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx"
+                  >
+                    <input type="hidden" name="LinkId" value="fc8b78a3-0ef1-4c9a-a089-f48d0812a2fd" />
+                    <button
+                      type="submit"
+                      className={`w-full py-4 rounded-full font-bold text-lg transition-all duration-300 ${
+                        plan.popular
+                          ? 'bg-white text-red-600 hover:bg-gray-100'
+                          : plan.restricted
+                          ? 'bg-yellow-600 text-black hover:bg-yellow-500'
+                          : 'bg-red-600 text-white hover:bg-red-700'
+                      }`}
+                    >
+                      {plan.cta}
+                    </button>
+                  </form>
+                ) : (
+                  <button className={`w-full py-4 rounded-full font-bold text-lg transition-all duration-300 ${
+                    plan.popular 
+                      ? 'bg-white text-red-600 hover:bg-gray-100' 
+                      : plan.restricted
+                      ? 'bg-yellow-600 text-black hover:bg-yellow-500'
+                      : 'bg-red-600 text-white hover:bg-red-700'
+                  }`}>
+                    {plan.cta}
+                  </button>
+                )}
 
                 {plan.restricted && (
                   <p className="text-center text-xs text-yellow-300 mt-4 opacity-75">
