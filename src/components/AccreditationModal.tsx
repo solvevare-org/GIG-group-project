@@ -11,7 +11,7 @@ interface AccreditationModalProps {
   onClose: () => void;
 }
 
-const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose }) => {
+const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
   // 0: term sheet, 1: email, 2: code, 3: amount
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
@@ -40,7 +40,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
       setHasScrolledToEnd(true);
     }
   };
-  const handleContinueFromTerms = () => {
+  const handleContinueFromTerms = async () => {
     if (!name || !investorType) {
       setStatus('Please enter investor name and select investor type.');
       return;
@@ -63,6 +63,10 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
                     `;
                     const wrapper = document.createElement('div');
                     wrapper.className = 'pdf-reset pdf-page';
+                    if (!termsRef.current) {
+                      setStatus('Unable to generate PDF: term sheet not found.');
+                      return;
+                    }
                     const clone = termsRef.current.cloneNode(true) as HTMLElement;
                     clone.style.maxHeight = 'none';
                     clone.style.overflow = 'visible';
@@ -79,7 +83,7 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
                       jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
                     } as any;
                     await (html2pdf as any)().set(opt).from(container).save();
-  };
+    };
 
   // Step 1: Email input
   const handleSendCode = async () => {
@@ -525,5 +529,5 @@ const AccreditationModal: React.FC<AccreditationModalProps> = ({ isOpen, onClose
     </div>
   );
 };
-
+};
 export default AccreditationModal;
