@@ -26,6 +26,8 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
   const [verifying, setVerifying] = useState(false);
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
   const [amount, setAmount] = useState('50000');
+  const [isSponsor, setIsSponsor] = useState(false);
+  const [sponsorTier, setSponsorTier] = useState<'1000' | '5000' | ''>('');
   const amountOptions = Array.from({ length: 40 }, (_, i) => 50000 + i * 50000);
   const investorArticle = investorType === 'individual' ? 'an' : 'a';
   const investorDescriptor = investorType === 'individual'
@@ -478,19 +480,74 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
         {step === 3 && (
           <>
             <div className="text-center mb-4">
-              <h2 className="text-xl font-bold text-white mb-2">Select Investment Amount</h2>
-              <p className="text-xs text-gray-400">Choose your investment amount below.</p>
+              <h2 className="text-xl font-bold text-white mb-2">Choose Investment or Sponsorship</h2>
+              <p className="text-xs text-gray-400">Pick an investor amount or select a sponsorship tier.</p>
             </div>
-            <select
-              className="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full mb-4 text-white"
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
-            >
-              <option value="10">10</option>
-              {amountOptions.map(v => (
-                <option key={v} value={v}>{v.toLocaleString()}</option>
-              ))}
-            </select>
+            <div className="flex gap-2 mb-3">
+              <button
+                type="button"
+                onClick={() => { setIsSponsor(false); setSponsorTier(''); setAmount('50000'); }}
+                className={`flex-1 py-2 rounded-full text-sm font-semibold ${!isSponsor ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-200'}`}
+              >
+                Investor
+              </button>
+              <button
+                type="button"
+                onClick={() => { setIsSponsor(true); setSponsorTier('1000'); setAmount('1000'); }}
+                className={`flex-1 py-2 rounded-full text-sm font-semibold ${isSponsor ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-200'}`}
+              >
+                Sponsor
+              </button>
+            </div>
+            {!isSponsor ? (
+              <>
+                <select
+                  className="bg-gray-800 border border-gray-700 rounded px-3 py-2 w-full mb-4 text-white"
+                  value={amount}
+                  onChange={e => setAmount(e.target.value)}
+                >
+                  <option value="10">10</option>
+                  {amountOptions.map(v => (
+                    <option key={v} value={v}>{v.toLocaleString()}</option>
+                  ))}
+                </select>
+              </>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
+                <label className={`block cursor-pointer rounded-lg border ${sponsorTier==='1000' ? 'border-red-500' : 'border-gray-700'} bg-gray-800 p-3 text-gray-200`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">$1,000 Sponsorship Spot</div>
+                      <div className="text-xs text-gray-400 mt-1">30–45s shoutout script included</div>
+                    </div>
+                    <input
+                      type="radio"
+                      name="sponsor-tier"
+                      className="accent-red-600"
+                      checked={sponsorTier==='1000'}
+                      onChange={() => { setSponsorTier('1000'); setAmount('1000'); }}
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-gray-300 line-clamp-4">“Hey movie lovers! This is ____ proudly supporting No Right Way… Thanks to our sponsor, ____ [your brand], making bold stories come alive.”</p>
+                </label>
+                <label className={`block cursor-pointer rounded-lg border ${sponsorTier==='5000' ? 'border-red-500' : 'border-gray-700'} bg-gray-800 p-3 text-gray-200`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">$5,000 Premium Sponsorship Spot</div>
+                      <div className="text-xs text-gray-400 mt-1">Longer premium script + website mention</div>
+                    </div>
+                    <input
+                      type="radio"
+                      name="sponsor-tier"
+                      className="accent-red-600"
+                      checked={sponsorTier==='5000'}
+                      onChange={() => { setSponsorTier('5000'); setAmount('5000'); }}
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-gray-300 line-clamp-5">“Lights up, film fans! I’m thrilled to bring you… We’re proud to share this moment, brought to you by ____ [sponsor]… Visit our website (        ) to learn more.”</p>
+                </label>
+              </div>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={onClose}
@@ -502,13 +559,30 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                 onClick={() => {
                   try {
                     const html = termsRef.current?.outerHTML || '';
-                    const payload = { html, name, email, investorType, entityForm, jurisdiction, amount };
+                    const sponsorScripts = {
+                      '1000': `Hey movie lovers! This is ____ proudly supporting No Right Way, the new film starring Omari Hardwick—best known for Power and Army of the Dead—and directed by Anthony Hemingway. This gripping new drama promises raw performances, deep storytelling, and a visual style that pulls you in from the start. Whether you’re into powerful character journeys or cinematic craftsmanship, No Right Way is one to watch. Thanks to our sponsor, ____ [your brand], making bold stories come alive. Don’t miss it—support great cinema and keep watching for more!`,
+                      '5000': `Lights up, film fans! I’m thrilled to bring you something truly special: No Right Way, the much-anticipated new dramatic film from director Anthony Hemingway, starring powerhouse actor Omari Hardwick. You might recognize Omari from his unforgettable roles in Power and Zack Snyder’s Army of the Dead—here, he dives into an emotionally nuanced character, backed by Hemingway’s sharp cinematic vision.\n\nThis film blends raw intensity with thoughtful storytelling, exploring what it means to make tough choices when the stakes are highest. The kind of movie that grabs you, holds you, and stays with you after the credits roll.\n\nWe’re proud to share this moment, brought to you by ____ [sponsor], committed to championing compelling narratives and visionary filmmaking. Stay tuned—No Right Way is one film you won’t want to miss. Visit our website (        )to learn more and catch it when it hits theaters or streaming.`
+                    } as const;
+                    const payload = {
+                      html,
+                      name,
+                      email,
+                      investorType,
+                      entityForm,
+                      jurisdiction,
+                      amount,
+                      sponsor: isSponsor ? {
+                        tier: sponsorTier,
+                        script: sponsorTier ? sponsorScripts[sponsorTier] : ''
+                      } : undefined,
+                    };
                     localStorage.setItem('nrw_investor_payload', JSON.stringify(payload));
                   } catch {}
                   const qs = new URLSearchParams({ email, name, token, amount }).toString();
                   window.location.href = `/checkout?${qs}`;
                 }}
-                className="flex-1 py-2 rounded-full font-semibold transition-all text-xs md:text-sm bg-red-600 hover:bg-red-700 text-white"
+                disabled={isSponsor && !sponsorTier}
+                className={`flex-1 py-2 rounded-full font-semibold transition-all text-xs md:text-sm ${(!isSponsor || sponsorTier) ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-600 text-gray-400 cursor-not-allowed'}`}
               >
                 Continue to Checkout
               </button>
