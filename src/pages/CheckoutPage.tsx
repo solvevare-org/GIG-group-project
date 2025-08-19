@@ -60,62 +60,7 @@ const CheckoutPage: React.FC = () => {
 
   const env = import.meta.env.VITE_AUTHORIZE_ENV || 'sandbox';
 
-  const generateAndEmailTermSheet = async () => {
-    try {
-      const raw = localStorage.getItem('nrw_investor_payload');
-      if (!raw) return;
-      const payload = JSON.parse(raw || '{}') as { html?: string; name?: string; email?: string; investorType?: string; entityForm?: string; jurisdiction?: string; amount?: string };
-      if (!payload?.html || !email) return;
-      // Build a printable container overriding dark theme colors
-      const container = document.createElement('div');
-      const style = document.createElement('style');
-      style.textContent = `
-        .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
-        .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; }
-        .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; }
-        .pdf-reset a { color: #000 !important; text-decoration: none; }
-        .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
-        .pdf-reset [class*="max-h-"], .pdf-reset [style*="max-height"] { max-height: none !important; }
-        .pdf-reset [class*="overflow-"], .pdf-reset [style*="overflow"] { overflow: visible !important; }
-      `;
-      const wrapper = document.createElement('div');
-      wrapper.className = 'pdf-reset';
-      wrapper.innerHTML = payload.html;
-      container.appendChild(style);
-      container.appendChild(wrapper);
-
-      const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],
-        filename: `No-Right-Way-Term-Sheet-${(payload.name || 'Investor').replace(/[^a-z0-9\-_. ]/gi, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, backgroundColor: '#ffffff' },
-        pagebreak: { mode: ['css', 'legacy'] },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-      } as any;
-
-  // Generate PDF blob reliably via jsPDF instance
-  const pdf: any = await (html2pdf as any)().set(opt).from(container).toPdf().get('pdf');
-  const blob: Blob = pdf.output('blob');
-      // Upload to backend for emailing
-      const fd = new FormData();
-      fd.append('email', email);
-      fd.append('name', payload.name || '');
-      fd.append('investorType', payload.investorType || '');
-      fd.append('entityForm', payload.entityForm || '');
-      fd.append('jurisdiction', payload.jurisdiction || '');
-      fd.append('amount', payload.amount || amount || '');
-      fd.append('pdf', blob, 'Term-Sheet.pdf');
-      const resp = await apiFetch('/api/send-term-sheet', { method: 'POST', body: fd });
-      if (!resp.ok) {
-        let msg = 'Failed to email term sheet';
-        try { const j = await resp.json(); if (j?.message) msg = j.message; } catch {}
-        console.warn('send-term-sheet failed:', msg);
-        setStatus(msg);
-      }
-    } catch (e) {
-      // Swallow errors; emailing the PDF is best-effort post-payment
-    }
-  };
+  // (Removed unused generateAndEmailTermSheet; emailing occurs inline after payment.)
 
   useEffect(() => {
     if (location.protocol !== 'https:') {
@@ -289,7 +234,48 @@ const CheckoutPage: React.FC = () => {
             if (payRes.ok && data.ok) {
               setStatus('Payment successful. Sending documents...');
               addToast('Payment successful', 'success');
-              try { await generateAndEmailTermSheet(); } catch {}
+              try {
+                // Email term sheet with payment details
+                const raw = localStorage.getItem('nrw_investor_payload');
+                const payload = JSON.parse(raw || '{}');
+                const container = document.createElement('div');
+                const style = document.createElement('style');
+                style.textContent = `
+                  .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
+                  .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; }
+                `;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'pdf-reset';
+                wrapper.innerHTML = payload?.html || '';
+                container.appendChild(style);
+                container.appendChild(wrapper);
+                const opt = { margin: [0.5,0.5,0.5,0.5], image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, backgroundColor: '#ffffff' }, pagebreak: { mode: ['css','legacy'] }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } } as any;
+                const pdf: any = await (html2pdf as any)().set(opt).from(container).toPdf().get('pdf');
+                const blob: Blob = pdf.output('blob');
+                const fd2 = new FormData();
+                fd2.append('email', email);
+                fd2.append('name', payload?.name || '');
+                fd2.append('investorType', payload?.investorType || '');
+                fd2.append('entityForm', payload?.entityForm || '');
+                fd2.append('jurisdiction', payload?.jurisdiction || '');
+                fd2.append('amount', String(data.amount || ''));
+                if (data?.invoiceNumber) fd2.append('invoiceNumber', data.invoiceNumber);
+                if (data?.transactionId) fd2.append('transactionId', data.transactionId);
+                if (data?.cardLast4) fd2.append('cardLast4', String(data.cardLast4));
+                if (data?.cardType) fd2.append('cardType', String(data.cardType));
+                fd2.append('pdf', blob, 'Term-Sheet.pdf');
+                const resp2 = await apiFetch('/api/send-term-sheet', { method: 'POST', body: fd2 });
+                if (!resp2.ok) {
+                  try { const j = await resp2.json(); setStatus(j?.message || 'Failed to email term sheet'); } catch {}
+                }
+              } catch {}
+              try {
+                await apiFetch('/api/send-welcome-email', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email, name: initialName })
+                });
+              } catch {}
               // Redirect to landing page after sending docs (best effort)
               setTimeout(() => { window.location.href = '/'; }, 1500);
               resolve();
