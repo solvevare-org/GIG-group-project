@@ -64,94 +64,25 @@ const CheckoutPage: React.FC = () => {
     try {
       const raw = localStorage.getItem('nrw_investor_payload');
       if (!raw) return;
-      const payload = JSON.parse(raw || '{}') as {
-        html?: string;
-        name?: string;
-        email?: string;
-        investorType?: string;
-        entityForm?: string;
-        jurisdiction?: string;
-        amount?: string;
-      };
+      const payload = JSON.parse(raw || '{}') as { html?: string; name?: string; email?: string; investorType?: string; entityForm?: string; jurisdiction?: string; amount?: string };
       if (!payload?.html || !email) return;
-
-      // Build an offscreen white print root and sanitize the content to avoid dark UI styles
-      const printRoot = document.createElement('div');
-      printRoot.setAttribute('id', 'pdf-print-root');
-      Object.assign(printRoot.style, {
-        position: 'fixed',
-        left: '-10000px',
-        top: '0',
-        width: '816px', // ~8.5in minus margins at 96dpi approximation
-        background: '#ffffff',
-        color: '#000000',
-        padding: '16px',
-        zIndex: '2147483647',
-      } as CSSStyleDeclaration);
-
+      // Build a printable container overriding dark theme colors
+      const container = document.createElement('div');
       const style = document.createElement('style');
       style.textContent = `
-        /* Reset to a print-friendly theme */
-        #pdf-print-root, #pdf-print-root * {
-          background: #fff !important;
-          color: #000 !important;
-          box-shadow: none !important;
-          text-shadow: none !important;
-          border-color: #000 !important;
-          border-radius: 0 !important;
-          outline: none !important;
-        }
-        #pdf-print-root a { text-decoration: none !important; color: #000 !important; }
-        #pdf-print-root img { max-width: 100% !important; }
-        /* Ensure content can expand fully */
-        #pdf-print-root [class*="max-h-"], #pdf-print-root [style*="max-height"] { max-height: none !important; }
-        #pdf-print-root [class*="overflow-"], #pdf-print-root [style*="overflow"] { overflow: visible !important; }
+        .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
+        .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; }
+        .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; }
+        .pdf-reset a { color: #000 !important; text-decoration: none; }
+        .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
+        .pdf-reset [class*="max-h-"], .pdf-reset [style*="max-height"] { max-height: none !important; }
+        .pdf-reset [class*="overflow-"], .pdf-reset [style*="overflow"] { overflow: visible !important; }
       `;
-
       const wrapper = document.createElement('div');
+      wrapper.className = 'pdf-reset';
       wrapper.innerHTML = payload.html;
-
-      // Strip problematic classes and inline styles recursively
-      const stripTokens = [
-        /^bg[-/]/,
-        /^text-white$/,
-        /^text-gray.*/,
-        /^dark:.*/,
-        /^rounded.*/,
-        /^shadow.*/,
-        /^ring.*/,
-        /^backdrop.*/,
-        /^(from|via|to)-.*/,
-        /gradient/,
-        /^opacity.*/,
-        /^border-gray.*/,
-        /^border-red.*/,
-      ];
-      const sanitizeEl = (el: Element) => {
-        if (!(el instanceof HTMLElement)) return;
-        // Remove dark/backdrop background via inline styles
-        el.style.removeProperty('background');
-        el.style.removeProperty('background-color');
-        el.style.removeProperty('backgroundImage');
-        el.style.removeProperty('filter');
-        el.style.removeProperty('box-shadow');
-        el.style.borderRadius = '0';
-        el.style.backgroundColor = 'transparent';
-        el.style.color = '#000';
-        // Remove class tokens that produce dark UI
-        const classes = (el.className || '').toString().split(/\s+/).filter(Boolean);
-        if (classes.length) {
-          const kept = classes.filter(c => !stripTokens.some(rx => rx.test(c)));
-          el.className = kept.join(' ');
-        }
-        // Recurse
-        Array.from(el.children).forEach(sanitizeEl);
-      };
-      sanitizeEl(wrapper);
-
-      printRoot.appendChild(style);
-      printRoot.appendChild(wrapper);
-      document.body.appendChild(printRoot);
+      container.appendChild(style);
+      container.appendChild(wrapper);
 
       const opt = {
         margin: [0.5, 0.5, 0.5, 0.5],
@@ -162,13 +93,9 @@ const CheckoutPage: React.FC = () => {
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
       } as any;
 
-      // Generate PDF blob via jsPDF instance from sanitized DOM
-      const pdf: any = await (html2pdf as any)().set(opt).from(printRoot).toPdf().get('pdf');
-      const blob: Blob = pdf.output('blob');
-
-      // Clean up the injected DOM
-      try { document.body.removeChild(printRoot); } catch {}
-
+  // Generate PDF blob reliably via jsPDF instance
+  const pdf: any = await (html2pdf as any)().set(opt).from(container).toPdf().get('pdf');
+  const blob: Blob = pdf.output('blob');
       // Upload to backend for emailing
       const fd = new FormData();
       fd.append('email', email);
@@ -178,7 +105,13 @@ const CheckoutPage: React.FC = () => {
       fd.append('jurisdiction', payload.jurisdiction || '');
       fd.append('amount', payload.amount || amount || '');
       fd.append('pdf', blob, 'Term-Sheet.pdf');
-      await apiFetch('/api/send-term-sheet', { method: 'POST', body: fd });
+      const resp = await apiFetch('/api/send-term-sheet', { method: 'POST', body: fd });
+      if (!resp.ok) {
+        let msg = 'Failed to email term sheet';
+        try { const j = await resp.json(); if (j?.message) msg = j.message; } catch {}
+        console.warn('send-term-sheet failed:', msg);
+        setStatus(msg);
+      }
     } catch (e) {
       // Swallow errors; emailing the PDF is best-effort post-payment
     }
