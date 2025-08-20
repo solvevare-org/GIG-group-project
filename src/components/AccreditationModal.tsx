@@ -37,7 +37,15 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
 
   // Generate a PDF Blob of the visible term sheet content
   const generateTermSheetPdfBlob = async (): Promise<Blob> => {
-    if (!termsRef.current) throw new Error('Missing term sheet content');
+    // Use live DOM if available else fallback to stored HTML snapshot
+    const htmlSnapshot = termsRef.current?.outerHTML || (() => {
+      try {
+        const raw = localStorage.getItem('nrw_investor_payload');
+        const payload = raw ? JSON.parse(raw) : null;
+        return payload?.html as string | undefined;
+      } catch { return undefined; }
+    })();
+    if (!htmlSnapshot) throw new Error('Missing term sheet content');
     const opt = {
       margin: [0.5, 0.5, 0.5, 0.5],
       image: { type: 'jpeg', quality: 0.98 },
@@ -65,7 +73,7 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
     `;
     const wrapper = document.createElement('div');
     wrapper.className = 'pdf-reset';
-    wrapper.innerHTML = termsRef.current.outerHTML;
+  wrapper.innerHTML = htmlSnapshot;
     container.appendChild(style);
     container.appendChild(wrapper);
     document.body.appendChild(container);
@@ -99,6 +107,21 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
       setStatus('Please provide the company type and jurisdiction.');
       return;
     }
+    // Persist a snapshot of the term sheet HTML and filled fields for later PDF generation
+    try {
+      const html = termsRef.current?.outerHTML || '';
+      const payload = {
+        html,
+        name,
+        email,
+        investorType,
+        entityForm,
+        jurisdiction,
+        amount,
+        sponsor: isSponsor ? { tier: sponsorTier } : undefined,
+      };
+      localStorage.setItem('nrw_investor_payload', JSON.stringify(payload));
+    } catch {}
     // Proceed to email verification step
     setStatus('');
     setStep(1);
