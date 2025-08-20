@@ -246,9 +246,21 @@ const CheckoutPage: React.FC = () => {
                     transactionId: data?.transactionId,
                     cardLast4: data?.cardLast4,
                     cardType: data?.cardType,
+                    // richer billing details
+                    firstName,
+                    lastName,
+                    address,
+                    city,
+                    state,
+                    zip,
+                    country,
                     termSheetKey: key,
                   } as any;
-                  await apiFetch('/api/send-term-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                  const resp = await apiFetch('/api/send-term-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                  if (!resp.ok) {
+                    // If backend rejected due to empty S3 object (422), fallback to client-side send
+                    if (resp.status === 422) throw new Error('S3 term sheet not ready');
+                  }
                 } else {
                   // Fallback to client-side generate-and-send (previous behavior)
                   const raw = localStorage.getItem('nrw_investor_payload');
