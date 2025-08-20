@@ -77,7 +77,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
             <span className="flex items-center justify-center gap-3 w-full">
               <Shield className="w-6 h-6" />
               <span className="block w-full text-center">
-                INSTITUTIONAL AND ACCREDITED INVESTORS ACCESS AND CHECKOUT PORTAL
+                INSTITUTIONAL AND ACCREDITED INVESTORS TERM SHEET
               </span>
             </span>
           </button>
@@ -96,18 +96,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
             </span>
           </div>
         </div>
-
-        {/* Key Players */}
-        {/* <div className="text-center text-gray-500 text-sm tracking-widest">
-          <p className="mb-2">FEATURING</p>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-xs md:text-sm">
-            <a href="#" className="hover:text-red-400 transition-colors cursor-pointer">M88</a>
-            <a href="#" className="hover:text-red-400 transition-colors cursor-pointer">UTA</a>
-            <a href="#" className="hover:text-red-400 transition-colors cursor-pointer">BASSETT VANCE PRODUCTION</a>
-            <a href="#" className="hover:text-red-400 transition-colors cursor-pointer">WEILD & CO.</a>
-            <a href="#" className="hover:text-red-400 transition-colors cursor-pointer">RAMO LAW</a>
-          </div>
-        </div> */}
       </div>
 
       {/* Scroll Indicator: only show if scrollable */}

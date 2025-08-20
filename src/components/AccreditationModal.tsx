@@ -360,12 +360,12 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                 onScroll={handleTermsScroll}
               >
                 <p className="uppercase tracking-wide text-gray-300">SENT VIA EMAIL</p>
-                <p><strong>{name || '[INVESTOR]'}</strong></p>
+                <p><strong>INVESTOR</strong></p>
                 <p>Email: {email || '[Email]'}</p>
                 <p className="mt-2">Re: Term Sheet / "No Right Way"</p>
-                <p>Dear {name || '__________'} :</p>
+                <p>Dear Investor :</p>
                 <p>
-                  This letter is intended to set forth the basic terms of understanding between {name || '[INVESTOR]'}, {investorArticle} {investorDescriptor} ("Investor") on the one hand and No Right Way Productions LLC ("Company") on the other hand, in connection with the financing for the motion picture currently entitled "No Right Way" (the "Picture"). Investor has expressed interest in investing funds into Company for the purposes set forth herein.
+                  This letter is intended to set forth the basic terms of understanding between {investorArticle} {investorDescriptor} ("Investor") on the one hand and No Right Way Productions LLC ("Company") on the other hand, in connection with the financing for the motion picture currently entitled "No Right Way" (the "Picture"). Investor has expressed interest in investing funds into Company for the purposes set forth herein.
                 </p>
                 <p>
                   Please review the terms of this letter (referred to as the "Term Sheet") and if you agree to the principal terms and conditions below please sign and submit your intended investment towards the financing of the Picture in the amount no less than Fifty Thousand United States Dollars (US$50,000.00) (the "Investment"), which shall be a non-secured, non-recourse investment and payable to Company under the following terms:
