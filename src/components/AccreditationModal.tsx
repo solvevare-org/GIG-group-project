@@ -18,6 +18,20 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
   const [investorType, setInvestorType] = useState<'individual' | 'company' | ''>('');
   const [entityForm, setEntityForm] = useState(''); // e.g., Corporation, LLC
   const [jurisdiction, setJurisdiction] = useState(''); // e.g., Delaware, New York
+  // Signature block fields
+  const [signerName, setSignerName] = useState(''); // By:
+  const [titleIts, setTitleIts] = useState(''); // Its:
+  const [address1, setAddress1] = useState('');
+  const [address2, setAddress2] = useState('');
+  const [agreementDate, setAgreementDate] = useState<string>(() => {
+    try {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${yyyy}-${mm}-${dd}`; // for <input type="date">
+    } catch { return ''; }
+  });
   const [email, setEmail] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [status, setStatus] = useState('');
@@ -117,6 +131,11 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
         investorType,
         entityForm,
         jurisdiction,
+  signerName,
+  titleIts,
+  address1,
+  address2,
+  agreementDate,
         amount,
         sponsor: isSponsor ? { tier: sponsorTier } : undefined,
       };
@@ -272,6 +291,55 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                     </div>
                   </>
                 )}
+                <div>
+                  <label className="block text-gray-400 mb-1">Signer Name (By:)</label>
+                  <input
+                    type="text"
+                    value={signerName}
+                    onChange={(e) => setSignerName(e.target.value)}
+                    placeholder="Person signing for investor"
+                    className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-1">Title (Its:)</label>
+                  <input
+                    type="text"
+                    value={titleIts}
+                    onChange={(e) => setTitleIts(e.target.value)}
+                    placeholder="e.g. CEO, Manager"
+                    className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-gray-400 mb-1">Address Line 1</label>
+                  <input
+                    type="text"
+                    value={address1}
+                    onChange={(e) => setAddress1(e.target.value)}
+                    placeholder="Street, Suite"
+                    className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+                  />
+                </div>
+                <div className="md:col-span-1">
+                  <label className="block text-gray-400 mb-1">Address Line 2</label>
+                  <input
+                    type="text"
+                    value={address2}
+                    onChange={(e) => setAddress2(e.target.value)}
+                    placeholder="City, State ZIP"
+                    className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-1">Agreement Date</label>
+                  <input
+                    type="date"
+                    value={agreementDate}
+                    onChange={(e) => setAgreementDate(e.target.value)}
+                    className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+                  />
+                </div>
                 <div className="md:col-span-3">
                   <label className="block text-gray-400 mb-1">Email Address</label>
                   <input
@@ -330,12 +398,12 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                   <p>Name: _________________________</p>
                   <p>Date: _________________________</p>
                   <p className="mt-3">INVESTOR:</p>
-                  <p>By: _______________________________</p>
+                  <p>By: {signerName || '_______________________________'}</p>
                   <p>Name: {name || '___________________'}</p>
-                  <p>[Its: _______________________]</p>
-                  <p>Address: ___________________</p>
-                  <p>___________________________</p>
-                  <p>Date: ______________________</p>
+                  <p>[Its: {titleIts || '_______________________'}]</p>
+                  <p>Address: {address1 || '___________________'}</p>
+                  <p>{address2 || '___________________________'}</p>
+                  <p>Date: {agreementDate || '______________________'}</p>
                 </div>
 
                 {/* Exhibit NP */}
@@ -662,6 +730,11 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                       investorType,
                       entityForm,
                       jurisdiction,
+                      signerName,
+                      titleIts,
+                      address1,
+                      address2,
+                      agreementDate,
                       amount,
                       sponsor: isSponsor ? {
                         tier: sponsorTier,
