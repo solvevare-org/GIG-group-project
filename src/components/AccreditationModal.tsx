@@ -35,6 +35,54 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
     : (entityForm && jurisdiction ? `${entityForm} under the laws of ${jurisdiction}` : (entityForm || 'company'));
   const termsRef = useRef<HTMLDivElement>(null);
 
+  // Generate a PDF Blob of the visible term sheet content
+  const generateTermSheetPdfBlob = async (): Promise<Blob> => {
+    if (!termsRef.current) throw new Error('Missing term sheet content');
+    const opt = {
+      margin: [0.5, 0.5, 0.5, 0.5],
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, backgroundColor: '#ffffff', letterRendering: true, useCORS: true, scrollX: 0, scrollY: 0 },
+      pagebreak: { mode: ['css', 'legacy'] },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+    } as any;
+    const container = document.createElement('div');
+    const style = document.createElement('style');
+    style.textContent = `
+      .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
+      .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; width: 7.5in; max-width: 7.5in; margin: 0 auto; }
+      .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; line-height: 1.25; margin: 0 0 8px 0; }
+      .pdf-reset a { color: #000 !important; text-decoration: none; }
+      .pdf-reset p, .pdf-reset li { line-height: 1.5; margin: 0 0 8px 0; orphans: 2; widows: 2; }
+      .pdf-reset ol, .pdf-reset ul { padding-left: 20px; }
+      .pdf-reset p, .pdf-reset li, .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { page-break-inside: avoid; break-inside: avoid; }
+      .pdf-reset h3 { break-before: page; page-break-before: always; }
+      .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
+      .pdf-reset [class*="max-h-"], .pdf-reset [style*="max-height"] { max-height: none !important; }
+      .pdf-reset [class*="overflow-"], .pdf-reset [style*="overflow"] { overflow: visible !important; }
+      .pdf-reset .rounded-xl { border-radius: 0 !important; }
+      .pdf-reset .bg-gray-800 { background: #fff !important; }
+      .pdf-reset .text-gray-300, .pdf-reset .text-gray-400 { color: #000 !important; }
+    `;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pdf-reset';
+    wrapper.innerHTML = termsRef.current.outerHTML;
+    container.appendChild(style);
+    container.appendChild(wrapper);
+    document.body.appendChild(container);
+    let blob: Blob | null = null;
+    try {
+      const pdf: any = await (html2pdf as any)().set(opt).from(container).toPdf().get('pdf');
+      blob = pdf.output('blob');
+    } catch {}
+    if (!blob || (blob as any).size < 5000) {
+      const pdf2: any = await (html2pdf as any)().set(opt).from(wrapper).toPdf().get('pdf');
+      blob = pdf2.output('blob');
+    }
+    container.remove();
+    if (!blob) throw new Error('Failed to generate PDF');
+    return blob;
+  };
+
   // Step 0: Term sheet
   const handleTermsScroll: React.UIEventHandler<HTMLDivElement> = (e) => {
     const el = e.currentTarget;
@@ -50,70 +98,6 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
     if (investorType === 'company' && (!entityForm || !jurisdiction)) {
       setStatus('Please provide the company type and jurisdiction.');
       return;
-    }
-    // Generate PDF now and upload to S3 so payment emails can attach it reliably
-    try {
-      if (!termsRef.current) throw new Error('Missing terms');
-      setStatus('Preparing term sheet...');
-      const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, backgroundColor: '#ffffff', letterRendering: true, useCORS: true, scrollX: 0, scrollY: 0 },
-        pagebreak: { mode: ['css', 'legacy'] },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-      } as any;
-      const container = document.createElement('div');
-      const style = document.createElement('style');
-      style.textContent = `
-        .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
-        .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; width: 7.5in; max-width: 7.5in; margin: 0 auto; }
-        .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; line-height: 1.25; margin: 0 0 8px 0; }
-        .pdf-reset a { color: #000 !important; text-decoration: none; }
-        .pdf-reset p, .pdf-reset li { line-height: 1.5; margin: 0 0 8px 0; orphans: 2; widows: 2; }
-        .pdf-reset ol, .pdf-reset ul { padding-left: 20px; }
-        .pdf-reset p, .pdf-reset li, .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { page-break-inside: avoid; break-inside: avoid; }
-        .pdf-reset h3 { break-before: page; page-break-before: always; }
-        .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
-        .pdf-reset [class*="max-h-"], .pdf-reset [style*="max-height"] { max-height: none !important; }
-        .pdf-reset [class*="overflow-"], .pdf-reset [style*="overflow"] { overflow: visible !important; }
-        .pdf-reset .rounded-xl { border-radius: 0 !important; }
-        .pdf-reset .bg-gray-800 { background: #fff !important; }
-        .pdf-reset .text-gray-300, .pdf-reset .text-gray-400 { color: #000 !important; }
-      `;
-      const wrapper = document.createElement('div');
-      wrapper.className = 'pdf-reset';
-      wrapper.innerHTML = termsRef.current.outerHTML;
-      container.appendChild(style);
-      container.appendChild(wrapper);
-      document.body.appendChild(container);
-      let blob: Blob | null = null;
-      try {
-        const pdf: any = await (html2pdf as any)().set(opt).from(container).toPdf().get('pdf');
-        blob = pdf.output('blob');
-      } catch {}
-      if (!blob || (blob as any).size < 5000) {
-        const pdf2: any = await (html2pdf as any)().set(opt).from(wrapper).toPdf().get('pdf');
-        blob = pdf2.output('blob');
-      }
-      container.remove();
-      if (!blob) throw new Error('Failed to generate PDF');
-      // Upload to S3 via new endpoint, needs token
-      const token = localStorage.getItem('nrw_checkout_token') || '';
-      if (!token) { setStatus('Missing token. Please verify your email again.'); return; }
-      const fd = new FormData();
-      fd.append('email', email);
-      fd.append('pdf', blob, 'Term-Sheet.pdf');
-      const res = await apiFetch('/api/upload-term-sheet', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: fd });
-      if (!res.ok) {
-        const j = await res.json().catch(()=>({} as any));
-        setStatus(j?.message || 'Failed to upload term sheet');
-        return;
-      }
-      const info = await res.json();
-      if (info?.key) localStorage.setItem('nrw_term_sheet_key', info.key);
-    } catch (e) {
-      // If it fails, continue; fallback will email post-payment
-      console.warn('Pre-upload term sheet failed', e);
     }
     // Proceed to email verification step
     setStatus('');
@@ -150,7 +134,28 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
       const data = await res.json();
       setStatus(data.message || '');
       if (res.ok) {
-        setToken(data.token || '');
+        const t = data.token || '';
+        setToken(t);
+        // Store for later use (checkout and uploads)
+        if (t) localStorage.setItem('nrw_checkout_token', t);
+        // Generate and upload the term sheet now that email is verified
+        try {
+          setStatus('Uploading term sheet...');
+          const blob = await generateTermSheetPdfBlob();
+          const fd = new FormData();
+          fd.append('email', email);
+          fd.append('pdf', blob, 'Term-Sheet.pdf');
+          const up = await apiFetch('/api/upload-term-sheet', { method: 'POST', headers: { Authorization: `Bearer ${t}` }, body: fd });
+          const upJ = await up.json().catch(()=>({}));
+          if (up.ok && upJ?.key) {
+            localStorage.setItem('nrw_term_sheet_key', upJ.key);
+            setStatus('Term sheet saved. Continue.');
+          } else {
+            setStatus(upJ?.message || 'Failed to save term sheet');
+          }
+        } catch (e) {
+          console.warn('Upload term sheet failed after verification', e);
+        }
         setStep(3); // Move to amount selection
       }
     } catch (e) {
