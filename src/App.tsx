@@ -6,7 +6,6 @@ import AccreditationModal from './components/AccreditationModal';
 import PressSection from './components/PressSection';
 import FounderStorySection from './components/FounderStorySection';
 import CountdownSection from './components/CountdownSection';
-import StickyCtaBar from './components/StickyCtaBar';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
 import InvestorPortalSection from './components/InvestorPortalSection';
@@ -55,9 +54,7 @@ function Home() {
         <MerchandiseSection />
         <TestimonialsSection />
         <ContactSection />
-        <Footer />
-        
-        <StickyCtaBar onAccreditedClick={handleAccreditedClick} />
+  <Footer />
       </div>
 
       <AccreditationModal

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Target, Zap, ArrowRight, Quote, Film } from 'lucide-react';
+import { Users, Target, Zap, Quote, Film } from 'lucide-react';
 
 const FounderStorySection: React.FC = () => {
   return (
@@ -107,17 +107,7 @@ const FounderStorySection: React.FC = () => {
               </div>
             </div>
 
-            {/* Call to Action */}
-            <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-8 text-center">
-              <h3 className="text-2xl font-bold text-white mb-4">Join the Financial Revolution</h3>
-              <p className="text-red-100 mb-6">
-                Be part of a movement that's rewriting the rules of wealth creation
-              </p>
-              <button className="bg-white text-red-600 hover:bg-gray-100 px-8 py-4 rounded-full font-bold transition-all duration-300 flex items-center gap-3 mx-auto">
-                Start Your Journey
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
+            {/* Removed large CTA block per request */}
           </div>
         </div>
 
