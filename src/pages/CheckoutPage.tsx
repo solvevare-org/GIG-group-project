@@ -235,86 +235,74 @@ const CheckoutPage: React.FC = () => {
               setStatus('Payment successful. Sending documents...');
               addToast('Payment successful', 'success');
               try {
-                // Email term sheet with payment details
-                const raw = localStorage.getItem('nrw_investor_payload');
-                const payload = JSON.parse(raw || '{}');
-                const container = document.createElement('div');
-                const style = document.createElement('style');
-                style.textContent = `
-                  .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
-                  /* Fixed printable width equals Letter width minus margins (8.5in - 1in total horizontal) */
-                  .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; width: 7.5in; max-width: 7.5in; margin: 0 auto; }
-                  .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; line-height: 1.25; margin: 0 0 8px 0; }
-                  .pdf-reset a { color: #000 !important; text-decoration: none; }
-                  .pdf-reset p, .pdf-reset li { line-height: 1.5; margin: 0 0 8px 0; orphans: 2; widows: 2; }
-                  .pdf-reset ol, .pdf-reset ul { padding-left: 20px; }
-                  /* Try to keep blocks together across pages */
-                  .pdf-reset p, .pdf-reset li, .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { page-break-inside: avoid; break-inside: avoid; }
-                  /* Ensure Exhibit NP starts on a fresh page if present */
-                  .pdf-reset h3 { break-before: page; page-break-before: always; }
-                  .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
-                  .pdf-reset [class*="max-h-"], .pdf-reset [style*="max-height"] { max-height: none !important; }
-                  .pdf-reset [class*="overflow-"], .pdf-reset [style*="overflow"] { overflow: visible !important; }
-                  .pdf-reset .rounded-xl { border-radius: 0 !important; }
-                  .pdf-reset .bg-gray-800 { background: #fff !important; }
-                  .pdf-reset .text-gray-300, .pdf-reset .text-gray-400 { color: #000 !important; }
-                `;
-                const wrapper = document.createElement('div');
-                wrapper.className = 'pdf-reset';
-                wrapper.innerHTML = payload?.html || '';
-                container.appendChild(style);
-                container.appendChild(wrapper);
-                // Attach to DOM to avoid blank renders in some browsers
-                document.body.appendChild(container);
-                const opt = { margin: [0.5,0.5,0.5,0.5], image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, backgroundColor: '#ffffff', letterRendering: true, useCORS: true, scrollX: 0, scrollY: 0 }, pagebreak: { mode: ['css','legacy'] }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } } as any;
-                let blob: Blob | null = null;
-                try {
-                  const pdf: any = await (html2pdf as any)().set(opt).from(container).toPdf().get('pdf');
-                  blob = pdf.output('blob');
-                } catch {}
-                // Fallback 1: render from wrapper element directly
-                if (!blob || (blob as any).size < 5000) {
+                // Prefer pre-uploaded term sheet in S3
+                const key = localStorage.getItem('nrw_term_sheet_key') || '';
+                if (key) {
+                  const body = {
+                    email,
+                    name: initialName,
+                    amount: String(data.amount || ''),
+                    invoiceNumber: data?.invoiceNumber,
+                    transactionId: data?.transactionId,
+                    cardLast4: data?.cardLast4,
+                    cardType: data?.cardType,
+                    termSheetKey: key,
+                  } as any;
+                  await apiFetch('/api/send-term-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                } else {
+                  // Fallback to client-side generate-and-send (previous behavior)
+                  const raw = localStorage.getItem('nrw_investor_payload');
+                  const payload = JSON.parse(raw || '{}');
+                  const container = document.createElement('div');
+                  const style = document.createElement('style');
+                  style.textContent = `
+                    .pdf-reset, .pdf-reset * { color: #000 !important; background: #fff !important; box-shadow: none !important; }
+                    .pdf-reset { padding: 16px; font-family: Arial, sans-serif; overflow: visible !important; max-height: none !important; width: 7.5in; max-width: 7.5in; margin: 0 auto; }
+                    .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { color: #000 !important; line-height: 1.25; margin: 0 0 8px 0; }
+                    .pdf-reset a { color: #000 !important; text-decoration: none; }
+                    .pdf-reset p, .pdf-reset li { line-height: 1.5; margin: 0 0 8px 0; orphans: 2; widows: 2; }
+                    .pdf-reset ol, .pdf-reset ul { padding-left: 20px; }
+                    .pdf-reset p, .pdf-reset li, .pdf-reset h1, .pdf-reset h2, .pdf-reset h3, .pdf-reset h4 { page-break-inside: avoid; break-inside: avoid; }
+                    .pdf-reset h3 { break-before: page; page-break-before: always; }
+                    .pdf-reset .border, .pdf-reset [class*="border-"] { border-color: #000 !important; }
+                    .pdf-reset [class*="max-h-"], .pdf-reset [style*="max-height"] { max-height: none !important; }
+                    .pdf-reset [class*="overflow-"], .pdf-reset [style*="overflow"] { overflow: visible !important; }
+                    .pdf-reset .rounded-xl { border-radius: 0 !important; }
+                    .pdf-reset .bg-gray-800 { background: #fff !important; }
+                    .pdf-reset .text-gray-300, .pdf-reset .text-gray-400 { color: #000 !important; }
+                  `;
+                  const wrapper = document.createElement('div');
+                  wrapper.className = 'pdf-reset';
+                  wrapper.innerHTML = payload?.html || '';
+                  container.appendChild(style);
+                  container.appendChild(wrapper);
+                  document.body.appendChild(container);
+                  const opt = { margin: [0.5,0.5,0.5,0.5], image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, backgroundColor: '#ffffff', letterRendering: true, useCORS: true, scrollX: 0, scrollY: 0 }, pagebreak: { mode: ['css','legacy'] }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } } as any;
+                  let blob: Blob | null = null;
                   try {
+                    const pdf: any = await (html2pdf as any)().set(opt).from(container).toPdf().get('pdf');
+                    blob = pdf.output('blob');
+                  } catch {}
+                  if (!blob || (blob as any).size < 5000) {
                     const pdf2: any = await (html2pdf as any)().set(opt).from(wrapper).toPdf().get('pdf');
                     blob = pdf2.output('blob');
-                  } catch {}
-                }
-                // Fallback 2: rasterize with html2canvas manually and embed in jsPDF
-                if (!blob || (blob as any).size < 5000) {
-                  try {
-                    const canvas = await (window as any).html2canvas?.(wrapper, { scale: 2, backgroundColor: '#ffffff', useCORS: true, letterRendering: true });
-                    if (canvas) {
-                      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-                      // Lazy import jspdf from html2pdf internals if available
-                      const jsPDF = (window as any).jspdf?.jsPDF || (await import('jspdf')).jsPDF;
-                      const doc = new jsPDF({ unit: 'in', format: 'letter', orientation: 'portrait' });
-                      // Fit image to printable width 7.5in while preserving aspect ratio
-                      const pageWidth = 8.5 - 1.0; // 0.5in margins left/right
-                      const ratio = canvas.height / canvas.width;
-                      const w = pageWidth;
-                      const h = w * ratio;
-                      doc.addImage(imgData, 'JPEG', 0.5, 0.5, w, h, undefined, 'FAST');
-                      blob = doc.output('blob');
-                    }
-                  } catch {}
-                }
-                container.remove();
-                if (!blob) throw new Error('PDF generation failed');
-                const fd2 = new FormData();
-                fd2.append('email', email);
-                fd2.append('name', payload?.name || '');
-                fd2.append('investorType', payload?.investorType || '');
-                fd2.append('entityForm', payload?.entityForm || '');
-                fd2.append('jurisdiction', payload?.jurisdiction || '');
-                fd2.append('amount', String(data.amount || ''));
-                if (data?.invoiceNumber) fd2.append('invoiceNumber', data.invoiceNumber);
-                if (data?.transactionId) fd2.append('transactionId', data.transactionId);
-                if (data?.cardLast4) fd2.append('cardLast4', String(data.cardLast4));
-                if (data?.cardType) fd2.append('cardType', String(data.cardType));
-                fd2.append('pdf', blob, 'Term-Sheet.pdf');
-                const resp2 = await apiFetch('/api/send-term-sheet', { method: 'POST', body: fd2 });
-                if (!resp2.ok) {
-                  try { const j = await resp2.json(); setStatus(j?.message || 'Failed to email term sheet'); } catch {}
+                  }
+                  container.remove();
+                  if (blob) {
+                    const fd2 = new FormData();
+                    fd2.append('email', email);
+                    fd2.append('name', payload?.name || '');
+                    fd2.append('investorType', payload?.investorType || '');
+                    fd2.append('entityForm', payload?.entityForm || '');
+                    fd2.append('jurisdiction', payload?.jurisdiction || '');
+                    fd2.append('amount', String(data.amount || ''));
+                    if (data?.invoiceNumber) fd2.append('invoiceNumber', data.invoiceNumber);
+                    if (data?.transactionId) fd2.append('transactionId', data.transactionId);
+                    if (data?.cardLast4) fd2.append('cardLast4', String(data.cardLast4));
+                    if (data?.cardType) fd2.append('cardType', String(data.cardType));
+                    fd2.append('pdf', blob, 'Term-Sheet.pdf');
+                    await apiFetch('/api/send-term-sheet', { method: 'POST', body: fd2 });
+                  }
                 }
               } catch {}
               try {
