@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Send, MessageCircle } from 'lucide-react';
+import { Mail, Send, Facebook, Twitter, Instagram, Youtube, Linkedin, MessageCircle, Smartphone, Tiktok } from 'lucide-react';
 
 const ContactSection: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -71,7 +71,23 @@ const ContactSection: React.FC = () => {
           </form>
 
           <div className="mt-12 pt-8 border-t border-gray-800">
-            {/* Social icons removed as requested */}
+            <div className="flex flex-wrap justify-center items-center gap-6">
+              <a href="https://facebook.com/gigstudios" target="_blank" rel="noopener" aria-label="GIG Studios Facebook" className="flex items-center gap-2 text-gray-400 hover:text-blue-500 transition-colors duration-300">
+                <Facebook className="w-6 h-6" /> Facebook
+              </a>
+              <a href="https://instagram.com/gigstudios" target="_blank" rel="noopener" aria-label="GIG Studios Instagram" className="flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-colors duration-300">
+                <Instagram className="w-6 h-6" /> Instagram
+              </a>
+              <a href="https://youtube.com/@gigstudios" target="_blank" rel="noopener" aria-label="GIG Studios YouTube" className="flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors duration-300">
+                <Youtube className="w-6 h-6" /> YouTube
+              </a>
+              <a href="https://linkedin.com/company/gigstudios" target="_blank" rel="noopener" aria-label="GIG Studios LinkedIn" className="flex items-center gap-2 text-gray-400 hover:text-blue-700 transition-colors duration-300">
+                <Linkedin className="w-6 h-6" /> LinkedIn
+              </a>
+              <a href="https://tiktok.com/@gigstudios" target="_blank" rel="noopener" aria-label="GIG Studios TikTok" className="flex items-center gap-2 text-gray-400 hover:text-black transition-colors duration-300">
+                <Tiktok className="w-6 h-6" /> TikTok
+              </a>
+            </div>
           </div>
         </div>
       </div>
