@@ -350,6 +350,18 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                     className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
                   />
                 </div>
+                 <div className="md:col-span-3">
+                   <label className="block text-gray-400 mb-1">Investment Amount (USD)</label>
+                   <input
+                     type="number"
+                     min="1000"
+                     step="1000"
+                     value={amount}
+                     onChange={e => setAmount(e.target.value.replace(/\D+/g, ''))}
+                     placeholder="e.g. 50000"
+                     className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400"
+                   />
+                 </div>
               </div>
               <p className="text-[11px] text-gray-500 mt-2">Enter these details to render the term sheet with your information.</p>
             </div>
@@ -400,6 +412,7 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                   <p className="mt-3">INVESTOR:</p>
                   <p>By: {signerName || '_______________________________'}</p>
                   <p>Name: {name || '___________________'}</p>
+                   <p>Amount: {amount ? `$${Number(amount).toLocaleString()}` : '___________________'}</p>
                   <p>[Its: {titleIts || '_______________________'}]</p>
                   <p>Address: {address1 || '___________________'}</p>
                   <p>{address2 || '___________________________'}</p>
