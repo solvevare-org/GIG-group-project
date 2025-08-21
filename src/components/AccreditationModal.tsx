@@ -354,8 +354,8 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
                    <label className="block text-gray-400 mb-1">Investment Amount (USD)</label>
                    <input
                      type="number"
-                     min="1000"
-                     step="1000"
+                     min="50000"
+                     step="50000"
                      value={amount}
                      onChange={e => setAmount(e.target.value.replace(/\D+/g, ''))}
                      placeholder="e.g. 50000"
