@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Send, Facebook, Twitter, Instagram, Youtube, Linkedin, MessageCircle, Smartphone, Tiktok } from 'lucide-react';
+import { Mail, Send, Facebook, Instagram, Youtube, Linkedin, Play } from 'lucide-react';
 
 const ContactSection: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -85,7 +85,7 @@ const ContactSection: React.FC = () => {
                 <Linkedin className="w-6 h-6" /> LinkedIn
               </a>
               <a href="https://tiktok.com/@gigstudios" target="_blank" rel="noopener" aria-label="GIG Studios TikTok" className="flex items-center gap-2 text-gray-400 hover:text-black transition-colors duration-300">
-                <Tiktok className="w-6 h-6" /> TikTok
+                <Play className="w-6 h-6" /> TikTok
               </a>
             </div>
           </div>
