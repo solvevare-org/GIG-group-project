@@ -64,7 +64,7 @@ const ContactSection: React.FC = () => {
             )}
 
             <div className="text-center text-sm text-gray-500">
-              By subscribing, you agree to receive updates about No Right Way and From the Streets to the BoardRooms on WallStreet.
+              By subscribing, you agree to receive updates about No Right Way.
               <br />
               You can unsubscribe at any time.
             </div>
