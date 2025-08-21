@@ -1,5 +1,6 @@
 import React from 'react';
 import { Film } from 'lucide-react';
+import { FaInstagram, FaLinkedinIn, FaFacebookF, FaXTwitter } from 'react-icons/fa6';
 
 const Footer: React.FC = () => {
   return (
@@ -30,6 +31,23 @@ const Footer: React.FC = () => {
             </a>
           </div>
 
+            <div className="mt-12 pt-8 border-t border-gray-800">
+              <h3 className="text-white text-lg font-bold mb-4 text-left">Connect with GIG Group</h3>
+              <div className="flex gap-6 justify-start items-center">
+                <a href="https://instagram.com/gigstudios" target="_blank" rel="noopener" aria-label="Instagram" className="bg-black rounded-lg p-2 border border-white hover:bg-gray-900 transition-colors">
+                  <FaInstagram className="w-8 h-8 text-white" />
+                </a>
+                <a href="https://linkedin.com/company/gigstudios" target="_blank" rel="noopener" aria-label="LinkedIn" className="bg-black rounded-lg p-2 border border-white hover:bg-gray-900 transition-colors">
+                  <FaLinkedinIn className="w-8 h-8 text-white" />
+                </a>
+                <a href="https://facebook.com/gigstudios" target="_blank" rel="noopener" aria-label="Facebook" className="bg-black rounded-lg p-2 border border-white hover:bg-gray-900 transition-colors">
+                  <FaFacebookF className="w-8 h-8 text-white" />
+                </a>
+                <a href="https://twitter.com/gigstudios" target="_blank" rel="noopener" aria-label="X (Twitter)" className="bg-black rounded-lg p-2 border border-white hover:bg-gray-900 transition-colors">
+                  <FaXTwitter className="w-8 h-8 text-white" />
+                </a>
+              </div>
+            </div>
           <div className="border-t border-gray-800 pt-8">
             <p className="text-gray-500 text-sm">
               © 2025 From the Streets to the BoardRooms on WallStreet . All rights reserved. • There's no right way, only your way.
