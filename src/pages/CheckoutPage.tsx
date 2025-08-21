@@ -56,6 +56,7 @@ const CheckoutPage: React.FC = () => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [acceptReady, setAcceptReady] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const env = import.meta.env.VITE_AUTHORIZE_ENV || 'sandbox';
 
@@ -135,6 +136,7 @@ const CheckoutPage: React.FC = () => {
     const cvv = digitsOnly(cardCode);
     if (!(cvv.length === 3 || cvv.length === 4)) newErr.cardCode = 'CVV must be 3-4 digits';
   // E-signature upload removed; confirmation code + PDF acceptance suffice
+    if (!agreed) newErr.agreed = 'You must agree to the term sheet to continue';
 
     setErrors(newErr);
     return Object.keys(newErr).length === 0;
@@ -417,7 +419,19 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
-          <button disabled={loading || !acceptReady} className={`w-full mt-2 py-2 rounded ${loading || !acceptReady ? 'bg-gray-600' : 'bg-red-600 hover:bg-red-700'} font-semibold`}>
+            {/* Consent */}
+            <label className="flex items-start gap-3 bg-gray-800 border border-gray-700 rounded px-3 py-2">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e)=>{ setAgreed(e.target.checked); validate(); }}
+                className="mt-1 w-5 h-5 accent-red-600"
+              />
+              <span className="text-sm text-gray-200">I have read the Investor Term Sheet, understand the risks, and agree to the terms.</span>
+            </label>
+            {errors.agreed && <p className="text-red-500 text-xs">{errors.agreed}</p>}
+
+            <button disabled={loading || !acceptReady || !agreed} className={`w-full mt-2 py-2 rounded ${(loading || !acceptReady || !agreed) ? 'bg-gray-600' : 'bg-red-600 hover:bg-red-700'} font-semibold`}>
             {loading ? 'Processing...' : acceptReady ? 'Pay Now' : 'Loading Payment...'}
           </button>
         </form>

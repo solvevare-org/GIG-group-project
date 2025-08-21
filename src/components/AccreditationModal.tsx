@@ -171,7 +171,7 @@ const AccreditationModal = ({ isOpen, onClose }: AccreditationModalProps) => {
       const res = await apiFetch('/api/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code })
+        body: JSON.stringify({ email, code, agreed })
       });
       const data = await res.json();
       setStatus(data.message || '');
