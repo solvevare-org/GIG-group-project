@@ -71,22 +71,7 @@ const ContactSection: React.FC = () => {
           </form>
 
           <div className="mt-12 pt-8 border-t border-gray-800">
-            <div className="flex justify-center items-center gap-8">
-              <a 
-                href="#" 
-                className="flex items-center gap-2 text-gray-400 hover:text-gold transition-colors duration-300"
-              >
-                <MessageCircle className="w-5 h-5" />
-                WhatsApp
-              </a>
-              <a 
-                href="#" 
-                className="flex items-center gap-2 text-gray-400 hover:text-gold transition-colors duration-300"
-              >
-                <Mail className="w-5 h-5" />
-                LinkedIn
-              </a>
-            </div>
+            {/* Social icons removed as requested */}
           </div>
         </div>
       </div>
