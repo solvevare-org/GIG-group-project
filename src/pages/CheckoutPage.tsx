@@ -56,7 +56,8 @@ const CheckoutPage: React.FC = () => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [acceptReady, setAcceptReady] = useState(false);
-  const [agreed, setAgreed] = useState(false);
+  const [checkoutCode, setCheckoutCode] = useState('');
+  const [codeValidated, setCodeValidated] = useState(false);
 
   const env = import.meta.env.VITE_AUTHORIZE_ENV || 'sandbox';
 
@@ -88,6 +89,15 @@ const CheckoutPage: React.FC = () => {
       }
     };
     doCheck();
+    // Auto-send a fresh checkout code on arrival
+    const sendCheckoutCode = async () => {
+      const e = (email || '').trim();
+      if (!e) return;
+      try {
+        await apiFetch('/api/send-checkout-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: e }) });
+      } catch {}
+    };
+    sendCheckoutCode();
     // Preload Accept.js so it's ready on first click
     const preload = async () => {
       if (location.protocol !== 'https:') { setAcceptReady(false); return; }
@@ -134,9 +144,9 @@ const CheckoutPage: React.FC = () => {
     const yy = Number(y);
     if (y.length !== 4 || yy < curYear || yy > curYear + 20) newErr.expYear = 'Use YYYY (valid)';
     const cvv = digitsOnly(cardCode);
-    if (!(cvv.length === 3 || cvv.length === 4)) newErr.cardCode = 'CVV must be 3-4 digits';
+  if (!(cvv.length === 3 || cvv.length === 4)) newErr.cardCode = 'CVV must be 3-4 digits';
+  if (!codeValidated) newErr.checkoutCode = 'Enter and validate the confirmation code sent to your email';
   // E-signature upload removed; confirmation code + PDF acceptance suffice
-    if (!agreed) newErr.agreed = 'You must agree to the term sheet to continue';
 
     setErrors(newErr);
     return Object.keys(newErr).length === 0;
@@ -152,6 +162,12 @@ const CheckoutPage: React.FC = () => {
     setStatus('Processing...');
     setLoading(true);
     try {
+      // Ensure checkout confirmation code is validated
+      if (!codeValidated) {
+        setStatus('Please validate the confirmation code first.');
+        setLoading(false);
+        return;
+      }
       // Ensure payment library is loaded and ready
       await ensureAcceptJs(env);
       const ready = await waitForAccept();
@@ -335,6 +351,57 @@ const CheckoutPage: React.FC = () => {
         <h1 className="text-2xl font-bold mb-4">Checkout</h1>
         {status && <div className="text-yellow-400 text-sm mb-3">{status}</div>}
         <form onSubmit={onSubmit} className="space-y-3">
+          {/* Confirmation code gate */}
+          <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
+            <label className="block text-xs text-gray-400 mb-1">Confirmation Code (sent to {email || 'your email'})</label>
+            <div className="flex gap-2 items-start">
+              <input
+                className={`flex-1 bg-gray-900 border ${errors.checkoutCode && !codeValidated ? 'border-red-500' : 'border-gray-700'} rounded px-3 py-2`}
+                placeholder="6-digit code"
+                value={checkoutCode}
+                onChange={e => { setCheckoutCode(e.target.value.replace(/\D+/g, '').slice(0,6)); setCodeValidated(false); setErrors(prev=>{ const { checkoutCode, ...rest } = prev; return rest; }); }}
+                inputMode="numeric"
+              />
+              <button
+                type="button"
+                onClick={async () => {
+                  const code = checkoutCode.trim();
+                  if (code.length !== 6) { addToast('Enter the 6-digit code', 'error'); return; }
+                  try {
+                    setStatus('Validating code...');
+                    const res = await apiFetch('/api/validate-checkout-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, code }) });
+                    const j = await res.json();
+                    if (res.ok && j.ok) { setCodeValidated(true); addToast('Code validated', 'success'); setStatus(''); }
+                    else { setCodeValidated(false); addToast(j.message || 'Invalid code', 'error'); setStatus(j.message || 'Invalid code'); }
+                  } catch {
+                    setCodeValidated(false);
+                    addToast('Unable to validate code right now', 'error');
+                  }
+                }}
+                className={`px-3 py-2 rounded ${codeValidated ? 'bg-green-700' : 'bg-gray-700 hover:bg-gray-600'} text-white text-sm`}
+              >
+                {codeValidated ? 'Validated' : 'Validate'}
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    setStatus('Resending code...');
+                    const res = await apiFetch('/api/send-checkout-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+                    const j = await res.json().catch(()=>({}));
+                    addToast(j.message || (res.ok ? 'Code sent' : 'Unable to send code'), res.ok ? 'info' : 'error');
+                    setStatus('');
+                  } catch {
+                    addToast('Unable to send code', 'error');
+                  }
+                }}
+                className="px-3 py-2 rounded bg-gray-700 hover:bg-gray-600 text-white text-sm"
+              >
+                Resend
+              </button>
+            </div>
+            {!codeValidated && errors.checkoutCode && <p className="text-red-500 text-xs mt-1">{errors.checkoutCode}</p>}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <input className={`bg-gray-800 border ${errors.firstName ? 'border-red-500' : 'border-gray-700'} rounded px-3 py-2 w-full`} placeholder="First Name" value={firstName} onChange={e=>setFirstName(e.target.value)} onBlur={validate} />
@@ -419,19 +486,7 @@ const CheckoutPage: React.FC = () => {
             </div>
           </div>
 
-            {/* Consent */}
-            <label className="flex items-start gap-3 bg-gray-800 border border-gray-700 rounded px-3 py-2">
-              <input
-                type="checkbox"
-                checked={agreed}
-                onChange={(e)=>{ setAgreed(e.target.checked); validate(); }}
-                className="mt-1 w-5 h-5 accent-red-600"
-              />
-              <span className="text-sm text-gray-200">I have read the Investor Term Sheet, understand the risks, and agree to the terms.</span>
-            </label>
-            {errors.agreed && <p className="text-red-500 text-xs">{errors.agreed}</p>}
-
-            <button disabled={loading || !acceptReady || !agreed} className={`w-full mt-2 py-2 rounded ${(loading || !acceptReady || !agreed) ? 'bg-gray-600' : 'bg-red-600 hover:bg-red-700'} font-semibold`}>
+          <button disabled={loading || !acceptReady} className={`w-full mt-2 py-2 rounded ${loading || !acceptReady ? 'bg-gray-600' : 'bg-red-600 hover:bg-red-700'} font-semibold`}>
             {loading ? 'Processing...' : acceptReady ? 'Pay Now' : 'Loading Payment...'}
           </button>
         </form>
