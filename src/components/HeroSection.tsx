@@ -77,7 +77,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
             <span className="flex items-center justify-center gap-3 w-full">
               <Shield className="w-6 h-6" />
               <span className="block w-full text-center">
-                INSTITUTIONAL AND ACCREDITED INVESTORS TERM SHEET
+                ACCREDITED INVESTORS TERM SHEET ACCESS
               </span>
             </span>
           </button>

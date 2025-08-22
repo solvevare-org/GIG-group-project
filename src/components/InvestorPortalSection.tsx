@@ -160,7 +160,7 @@ const InvestorPortalSection: React.FC = () => {
                 className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl"
                 onClick={() => setShowSponsor(true)}
               >
-                SPONSOR NO RIGHT WAY
+                SPONSORS NO RIGHT WAY
               </button>
       {/* Sponsor Modal/Section */}
       {showSponsor && (
