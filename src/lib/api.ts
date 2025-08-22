@@ -1,5 +1,5 @@
 // Preferred backend base URL (override via Vite env VITE_API_BASE)
-const FORCED_BASE = 'http://localhost:8001/';
+const FORCED_BASE = 'https://backend.vire-s.com';
 const apiBase = FORCED_BASE.replace(/\/?$/, '');
 const ENV_BASE = (import.meta as any)?.env?.VITE_API_BASE as string | undefined;
 

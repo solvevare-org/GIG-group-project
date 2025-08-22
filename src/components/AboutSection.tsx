@@ -67,11 +67,9 @@ const AboutSection: React.FC = () => {
 
         {/* Featured Content */}
         <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-800">
-          <img 
-            src="https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg" 
-            alt="Behind the scenes of No Right Way"
-            className="w-full h-80 md:h-96 object-cover"
-          />
+          <div className="w-full h-80 md:h-96 flex items-center justify-center bg-red-700">
+            <span className="text-4xl md:text-6xl font-bold text-white">Stay tuned</span>
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center group hover:bg-opacity-30 transition-all duration-300">
             <button className="bg-red-600 hover:bg-red-700 text-white p-6 rounded-full transition-all duration-300 transform group-hover:scale-110 shadow-2xl">
