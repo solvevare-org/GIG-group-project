@@ -54,7 +54,7 @@ const CountdownSection: React.FC = () => {
           </h2>
           
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
-            Mark your calendars. The most anticipated financial education film of the decade 
+            Mark your calendars. Stay updated for the most anticipated financial drama film of the decade 
             premieres exclusively for our community first.
           </p>
         </div>

@@ -58,6 +58,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
             Written by: Anthony Hemingway, Ashoka <br className="hidden md:inline" />
             Thomas and Clay Ayers
           </p>
+          <p className="text-lg md:text-xl text-red-500 font-bold mt-2">
+            FROM THE STREETS TO THE BOARDROOMS ON WALLSTREET
+          </p>
         </div>
         
         {/* <p className="text-xl md:text-3xl text-gray-300 mb-4 font-light tracking-wide">
@@ -65,7 +68,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onAccreditedClick }) => {
         </p> */}
         
         <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-4xl mx-auto leading-relaxed">
-          A disruptive finance drama challenging conventional wisdom. 
+          A disruptive finance drama film challenging conventional wisdom. 
           <span className="text-red-400 font-semibold"> There's no single path to success.</span>
         </p>
 

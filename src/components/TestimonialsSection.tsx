@@ -18,7 +18,7 @@ const TestimonialsSection: React.FC = () => {
     {
       name: 'Emily Davis',
       role: 'Business Owner',
-      content: '"The rebellious approach to financial education is exactly what I needed. No more cookie-cutter advice - just real, actionable insights."',
+      content: '"The rebellious approach to financial drama is exactly what I needed. No more cookie-cutter advice - just real, actionable insights."',
       rating: 5
     }
   ];
@@ -69,7 +69,7 @@ const TestimonialsSection: React.FC = () => {
               Featured in Press
             </h3>
             <p className="text-gray-400 mb-6">
-              Read the exclusive coverage on our revolutionary approach to financial education
+              Read the exclusive coverage on our revolutionary approach to financial drama
             </p>
             <a 
               href="#" 

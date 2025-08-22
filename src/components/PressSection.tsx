@@ -13,7 +13,7 @@ const PressSection: React.FC = () => {
             Making <span className="text-red-500">Headlines</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Our revolutionary approach to financial education is gaining attention from industry leaders and major media outlets
+            Our revolutionary approach to financial market is gaining attention from industry leaders and major media outlets
           </p>
         </div>
 
@@ -47,7 +47,7 @@ const PressSection: React.FC = () => {
               <Quote className="w-8 h-8 text-red-500 opacity-50 mb-4" />
               <blockquote className="text-xl md:text-2xl text-gray-200 leading-relaxed mb-6 italic font-light">
                 "Omari Hardwick and Anthony Hemingway are teaming up for 'No Right Way,' 
-                a groundbreaking financial education film that challenges conventional wisdom 
+                a groundbreaking financial drama film that challenges conventional wisdom 
                 about wealth building and investment strategies."
               </blockquote>
               <div className="flex items-center justify-between">
@@ -72,7 +72,7 @@ const PressSection: React.FC = () => {
               <TrendingUp className="w-8 h-8 text-red-500 mx-auto mb-3" />
               <h4 className="text-white font-bold mb-2">Industry Impact</h4>
               <p className="text-gray-400 text-sm leading-relaxed">
-                "Revolutionary approach to financial education"
+                "Revolutionary approach to financial markets"
               </p>
               <div className="flex justify-center mt-3">
                 {[...Array(5)].map((_, i) => (

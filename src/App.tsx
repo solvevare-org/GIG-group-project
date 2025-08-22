@@ -66,9 +66,9 @@ function Home() {
         <PressSection />
         <CinematicSections
           items={[
-            { image: csA, heading: 'Momentum Builds', subheading: 'Momentum builds', position: 'bottom-left' },
-            { image: csB, heading: 'Action & Presence', subheading: 'Action and presence', position: 'center' },
-            // { image: csC, heading: 'Intimate View', subheading: 'Close, intimate view', position: 'center' },
+            { image: csA, heading: 'Momentum Builds',subheading: 'Rising Above Limits', position: 'bottom-left' },
+            { image: csB, heading: 'Action & Presence', subheading: 'Making Every Moment Count', position: 'bottom-left' },
+            
           ]}
         />
         <CountdownSection />
@@ -78,7 +78,7 @@ function Home() {
         <CinematicSections
           items={[
 
-            { image: csD, heading: 'Community & Motion', subheading: 'Community and motion', position: 'center' },
+            { image: csD, heading: 'Community & Motion', subheading: 'Driven by Unity', position: 'center' },
             { image: csE, heading: 'Intimate Frame', subheading: 'A close, intimate frame', position: 'bottom-left' },
           ]}
         />
