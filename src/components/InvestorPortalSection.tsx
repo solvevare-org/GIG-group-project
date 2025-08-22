@@ -3,12 +3,7 @@ import { Shield, Eye, TrendingUp, Users, Lock, Play, FileText, Calendar } from '
 
 const InvestorPortalSection: React.FC = () => {
   const [showSponsor, setShowSponsor] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
-
-  const handleSponsorSelect = (tier: string) => {
-    setSelectedTier(tier);
-    // You can add further logic here (e.g., redirect, open payment, etc.)
-  };
+  // Removed unused selectedTier state and handleSponsorSelect function
 
   return (
     <section className="py-24 bg-gray-900 relative overflow-hidden">
@@ -165,12 +160,12 @@ const InvestorPortalSection: React.FC = () => {
                 className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-2xl"
                 onClick={() => setShowSponsor(true)}
               >
-                Sponsor NO Right Way
+                SPONSOR NO RIGHT WAY
               </button>
       {/* Sponsor Modal/Section */}
       {showSponsor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm">
-          <div className="bg-gray-900 border border-red-500 rounded-2xl p-8 max-w-md w-full mx-2 relative text-center">
+  <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm">
+          <div className="bg-gray-900 border border-red-500 rounded-2xl p-8 max-w-md w-full mx-2 relative text-center max-h-[80vh] overflow-y-auto z-[100000]">
             <button
               onClick={() => setShowSponsor(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
@@ -178,38 +173,26 @@ const InvestorPortalSection: React.FC = () => {
               &times;
             </button>
             <h2 className="text-2xl font-bold text-white mb-4">Choose Sponsorship Tier</h2>
-            <div className="flex flex-col gap-6 items-center">
-              <button
-                className={`w-full py-4 rounded-xl font-bold text-lg border-2 ${selectedTier === '1000' ? 'border-gold bg-gold text-black' : 'border-gray-700 bg-gray-800 text-white'} hover:border-gold hover:bg-gold hover:text-black transition-all duration-200`}
-                onClick={() => handleSponsorSelect('1000')}
-              >
-                $1,000 Sponsor
-              </button>
-              <button
-                className={`w-full py-4 rounded-xl font-bold text-lg border-2 ${selectedTier === '5000' ? 'border-gold bg-gold text-black' : 'border-gray-700 bg-gray-800 text-white'} hover:border-gold hover:bg-gold hover:text-black transition-all duration-200`}
-                onClick={() => handleSponsorSelect('5000')}
-              >
-                $5,000 Sponsor
-              </button>
-            </div>
-            {selectedTier === '1000' && (
-              <div className="mt-8 text-left">
+            <div className="flex flex-col gap-8 items-center">
+              {/* $1,000 Sponsor Option */}
+              <div className="w-full bg-gray-800 rounded-xl p-4 border border-gray-700 text-left">
                 <h3 className="text-lg font-bold text-gold mb-2">Individual Sponsor – $1,000</h3>
-                <div className="bg-gray-800 rounded-lg p-4 text-gray-200 text-sm mb-4">
+                <div className="text-gray-200 text-sm mb-4">
                   <p>
-                    “Hey movie lovers! This is ____ proudly supporting No Right Way, the new film starring Omari Hardwick—best known for Power and Army of the Dead—and directed by Anthony Hemingway. This gripping new drama promises raw performances, deep storytelling, and a visual style that pulls you in from the start. Whether you’re into powerful character journeys or cinematic craftsmanship, No Right Way is one to watch. Thanks to our sponsor, ____ [your brand], making bold stories come alive. Don’t miss it—support great cinema and keep watching for more!”
+                    “Hey movie lovers! This is ____ proudly supporting No Right Way, the new film starring Omari Hardwick—best known for Power and Army of the Dead—and directed by Anthony Hemingway. This gripping new drama promises raw performances, deep storytelling, and a visual style that pulls you in from the start. Whether you’re into powerful character journeys or cinematic craftsmanship, No Right Way is one to watch. Thanks to our sponsor, ____ [your brand], making bold stories come alive. Don’t miss it—support great cinema and keep watching for more!”
                   </p>
                 </div>
-                <form name="PrePage" method="post" action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx">
-                  <input type="hidden" name="LinkId" value="3957bd27-0fbd-415e-ab16-4ddd0792d23e" />
-                  <input type="image" src="//content.authorize.net/images/buy-now-gold.gif" alt="Buy Now" />
-                </form>
+                <button
+                  className="w-full py-3 rounded-xl font-bold text-lg border-2 border-gold bg-gold text-black hover:bg-yellow-400 transition-all duration-200 mb-2"
+                  onClick={() => window.location.href = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx?LinkId=3957bd27-0fbd-415e-ab16-4ddd0792d23e'}
+                >
+                  Checkout $1,000 Sponsor
+                </button>
               </div>
-            )}
-            {selectedTier === '5000' && (
-              <div className="mt-8 text-left">
+              {/* $5,000 Sponsor Option */}
+              <div className="w-full bg-gray-800 rounded-xl p-4 border border-gray-700 text-left">
                 <h3 className="text-lg font-bold text-gold mb-2">Corporate Sponsor – $5,000</h3>
-                <div className="bg-gray-800 rounded-lg p-4 text-gray-200 text-sm mb-4">
+                <div className="text-gray-200 text-sm mb-4">
                   <p>
                     “Lights up, film fans! I’m thrilled to bring you something truly special: No Right Way, the much-anticipated new dramatic film from director Anthony Hemingway, starring powerhouse actor Omari Hardwick. You might recognize Omari from his unforgettable roles in Power and Zack Snyder’s Army of the Dead—here, he dives into an emotionally nuanced character, backed by Hemingway’s sharp cinematic vision.
                   </p>
@@ -217,15 +200,17 @@ const InvestorPortalSection: React.FC = () => {
                     This film blends raw intensity with thoughtful storytelling, exploring what it means to make tough choices when the stakes are highest. The kind of movie that grabs you, holds you, and stays with you after the credits roll.
                   </p>
                   <p>
-                    We’re proud to share this moment, brought to you by ____ [sponsor], committed to championing compelling narratives and visionary filmmaking. Stay tuned—No Right Way is one film you won’t want to miss. Visit our website (        )to learn more and catch it when it hits theaters or streaming.”
+                    We’re proud to share this moment, brought to you by ____ [sponsor], committed to championing compelling narratives and visionary filmmaking. Stay tuned—No Right Way is one film you won’t want to miss. Visit our website (        )to learn more and catch it when it hits theaters or streaming.”
                   </p>
                 </div>
-                <form name="PrePage" method="post" action="https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx">
-                  <input type="hidden" name="LinkId" value="8d1b882e-dc3e-4633-ab49-1252790f10ca" />
-                  <input type="image" src="//content.authorize.net/images/buy-now-gold.gif" alt="Buy Now" />
-                </form>
+                <button
+                  className="w-full py-3 rounded-xl font-bold text-lg border-2 border-gold bg-gold text-black hover:bg-yellow-400 transition-all duration-200"
+                  onClick={() => window.location.href = 'https://Simplecheckout.authorize.net/payment/CatalogPayment.aspx?LinkId=8d1b882e-dc3e-4633-ab49-1252790f10ca'}
+                >
+                  Checkout $5,000 Sponsor
+                </button>
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Send, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Mail, Send, Facebook, Instagram, Linkedin, Twitter } from 'lucide-react';
 
 const ContactSection: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -72,16 +72,19 @@ const ContactSection: React.FC = () => {
 
           <div className="mt-12 pt-8 border-t border-gray-800">
             <div className="flex flex-wrap justify-center items-center gap-6">
-              <a href="https://facebook.com/gigstudios" target="_blank" rel="noopener" aria-label="GIG Studios Facebook" className="flex items-center gap-2 text-gray-400 hover:text-blue-500 transition-colors duration-300">
+              <a href="https://www.facebook.com/share/1CTyfzdyMi/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="GIG Studios Facebook" className="flex items-center gap-2 text-gray-400 hover:text-blue-500 transition-colors duration-300">
                 <Facebook className="w-6 h-6" /> Facebook
               </a>
-              <a href="https://instagram.com/gigstudios" target="_blank" rel="noopener" aria-label="GIG Studios Instagram" className="flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-colors duration-300">
+              <a href="https://www.instagram.com/giggroupinc?igsh=MTQ3eWVvMTRxNW90aw%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="GIG Studios Instagram" className="flex items-center gap-2 text-gray-400 hover:text-pink-500 transition-colors duration-300">
                 <Instagram className="w-6 h-6" /> Instagram
               </a>
-              <a href="https://linkedin.com/company/gigstudios" target="_blank" rel="noopener" aria-label="GIG Studios LinkedIn" className="flex items-center gap-2 text-gray-400 hover:text-blue-700 transition-colors duration-300">
+              <a href="https://www.linkedin.com/company/gig-group/" target="_blank" rel="noopener" aria-label="GIG Studios LinkedIn" className="flex items-center gap-2 text-gray-400 hover:text-blue-700 transition-colors duration-300">
                 <Linkedin className="w-6 h-6" /> LinkedIn
               </a>
-            </div>
+              <a href="https://x.com/giginvestment?s=21" target="_blank" rel="noopener" aria-label="GIG Studios Twitter" className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-colors duration-300">
+                <Twitter className="w-6 h-6" /> Twitter
+              </a>
+              </div>
           </div>
         </div>
       </div>

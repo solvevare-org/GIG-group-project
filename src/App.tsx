@@ -6,6 +6,15 @@ import AccreditationModal from './components/AccreditationModal';
 import PressSection from './components/PressSection';
 import FounderStorySection from './components/FounderStorySection';
 import CountdownSection from './components/CountdownSection';
+import CinematicSections from './components/CinematicSections';
+import cs9 from '../picture/IMG-20250821-WA0009.jpg';
+import cs10 from '../picture/IMG-20250821-WA0010.jpg';
+import cs11 from '../picture/IMG-20250821-WA0011.jpg';
+import csA from '../picture/IMG-20250821-WA0012.jpg';
+import csB from '../picture/IMG-20250821-WA0013.jpg';
+// import csC from '../picture/IMG-20250821-WA0014.jpg';
+import csD from '../picture/IMG-20250821-WA0015.jpg';
+import csE from '../picture/IMG-20250821-WA0016.jpg';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
 import InvestorPortalSection from './components/InvestorPortalSection';
@@ -15,6 +24,7 @@ import MerchandiseSection from './components/MerchandiseSection';
 import TestimonialsSection from './components/TestimonialsSection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
+import { FaInstagram, FaLinkedinIn, FaFacebookF, FaXTwitter } from 'react-icons/fa6';
 
 function Home() {
   const [showPreloader, setShowPreloader] = useState(true);
@@ -44,10 +54,34 @@ function Home() {
           onAccreditedClick={handleAccreditedClick}
           onTrailerClick={handleTrailerClick}
         />
+        {/* Cinematic block (3 images) inserted after Hero for strong visual impact */}
+        <CinematicSections
+          items={[
+            { image: cs9, heading: 'The Faces Of Moments', subheading: 'A moment of impact', position: 'center' },
+            { image: cs10, heading: 'The Rebellion in Actions', subheading: 'Context and energy', position: 'center' },
+            { image: cs11, heading: 'From Wall Street to Revolution', subheading: 'Movement and motion', position: 'center' },
+
+          ]}
+        />
         <PressSection />
+        <CinematicSections
+          items={[
+            { image: csA, heading: 'Momentum Builds', subheading: 'Momentum builds', position: 'bottom-left' },
+            { image: csB, heading: 'Action & Presence', subheading: 'Action and presence', position: 'center' },
+            // { image: csC, heading: 'Intimate View', subheading: 'Close, intimate view', position: 'center' },
+          ]}
+        />
         <CountdownSection />
         <AboutSection />
         <FounderStorySection />
+        {/* Cinematic block (2 images) inserted after Founder story to break up text and add imagery */}
+        <CinematicSections
+          items={[
+
+            { image: csD, heading: 'Community & Motion', subheading: 'Community and motion', position: 'center' },
+            { image: csE, heading: 'Intimate Frame', subheading: 'A close, intimate frame', position: 'bottom-left' },
+          ]}
+        />
         <InvestorPortalSection />
         <SubscriptionSection />
         <PerksSection />
@@ -62,23 +96,48 @@ function Home() {
         onClose={() => setShowAccreditationModal(false)}
       />
 
-      {/* GIG Social Media Links - moved above Footer, reduced margin */}
-      <div className="flex flex-col items-center gap-2 mt-4 mb-0">
-        <h3 className="text-lg font-bold text-white mb-2">Connect with GIG Group</h3>
-        <div className="flex gap-4">
-          <a href="https://www.instagram.com/giggroupinc?igsh=MTQ3eWVvMTRxNW90aw%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500" title="Instagram">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg>
+      {/* Improved GIG Social Media Links UI/UX */}
+      <div className="mt-16 pb-8 border-t border-gray-800 flex flex-col items-center">
+        <h3 className="text-white text-2xl font-bold mb-6 text-center tracking-tight">Connect with GIG Group</h3>
+      <div className="flex gap-6 justify-center items-center">
+          <a
+            href="https://www.instagram.com/giggroupinc?igsh=MTQ3eWVvMTRxNW90aw%3D%3D&utm_source=qr"
+            target="_blank"
+            rel="noopener"
+            aria-label="Instagram"
+            className="group bg-black rounded-full p-3 border-2 border-white hover:border-pink-500 focus:border-pink-500 transition-all duration-200 shadow-lg"
+          >
+        <FaInstagram className="w-6 h-6 text-white group-hover:text-pink-500 group-focus:text-pink-500 transition-colors duration-200" />
           </a>
-          <a href="https://www.linkedin.com/company/gig-group/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400" title="LinkedIn">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><line x1="8" y1="11" x2="8" y2="16"/><line x1="8" y1="8" x2="8" y2="8"/><line x1="12" y1="11" x2="12" y2="16"/><path d="M16 11v3a2 2 0 0 1-4 0v-3"/></svg>
+          <a
+            href="https://www.linkedin.com/company/gig-group/"
+            target="_blank"
+            rel="noopener"
+            aria-label="LinkedIn"
+            className="group bg-black rounded-full p-3 border-2 border-white hover:border-blue-600 focus:border-blue-600 transition-all duration-200 shadow-lg"
+          >
+        <FaLinkedinIn className="w-6 h-6 text-white group-hover:text-blue-600 group-focus:text-blue-600 transition-colors duration-200" />
           </a>
-          <a href="https://www.facebook.com/share/1CTyfzdyMi/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600" title="Facebook">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 8h-2a2 2 0 0 0-2 2v2h4"/><line x1="12" y1="16" x2="12" y2="12"/></svg>
+          <a
+            href="https://www.facebook.com/share/1CTyfzdyMi/?mibextid=wwXIfr"
+            target="_blank"
+            rel="noopener"
+            aria-label="Facebook"
+            className="group bg-black rounded-full p-3 border-2 border-white hover:border-blue-500 focus:border-blue-500 transition-all duration-200 shadow-lg"
+          >
+        <FaFacebookF className="w-6 h-6 text-white group-hover:text-blue-500 group-focus:text-blue-500 transition-colors duration-200" />
           </a>
-          <a href="https://x.com/giginvestment?s=21" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400" title="X">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M4 20L20 4M4 4l16 16"/></svg>
+          <a
+            href="https://x.com/giginvestment?s=21"
+            target="_blank"
+            rel="noopener"
+            aria-label="X (Twitter)"
+            className="group bg-black rounded-full p-3 border-2 border-white hover:border-gray-400 focus:border-gray-400 transition-all duration-200 shadow-lg"
+          >
+        <FaXTwitter className="w-6 h-6 text-white group-hover:text-gray-400 group-focus:text-gray-400 transition-colors duration-200" />
           </a>
         </div>
+        <p className="text-gray-400 text-sm mt-6 text-center">Follow us for updates, news, and more.</p>
       </div>
     </div>
   );

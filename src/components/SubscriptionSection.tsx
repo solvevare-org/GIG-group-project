@@ -67,7 +67,7 @@ const SubscriptionSection: React.FC = () => {
       {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-red-900/5 to-transparent"></div>
       
-      <div className="max-w-7xl mx-auto px-4 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 relative">
         <div className="text-center mb-20">
           <h2 className="text-5xl md:text-7xl font-black text-white mb-8 leading-tight">
             CHOOSE YOUR
