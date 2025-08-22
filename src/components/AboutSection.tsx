@@ -1,5 +1,5 @@
 import React from 'react';
-import { Film, Zap, Target, Play, Users } from 'lucide-react';
+import { Film, Zap, Target, Play } from 'lucide-react';
 
 const AboutSection: React.FC = () => {
   return (
