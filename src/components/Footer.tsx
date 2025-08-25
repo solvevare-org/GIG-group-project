@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
           </div>
           <div className="border-t border-gray-800 pt-8">
             <p className="text-gray-500 text-sm">
-              © 2025 Copyrights No Right Way or GIG Studio. All rights reserved. • There's no right way, only your way.
+              © 2025 Copyrights No Right Way or GIG Studio. All rights reserved.
             </p>
           </div>
         </div>
