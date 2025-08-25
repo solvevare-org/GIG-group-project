@@ -71,7 +71,7 @@ function Home() {
             
           ]}
         />
-        <CountdownSection />
+        
         <AboutSection />
         <FounderStorySection />
         {/* Cinematic block (2 images) inserted after Founder story to break up text and add imagery */}
@@ -87,6 +87,7 @@ function Home() {
         <PerksSection />
         <MerchandiseSection />
         <TestimonialsSection />
+        <CountdownSection />
         <ContactSection />
   <Footer />
       </div>
@@ -98,7 +99,7 @@ function Home() {
 
       {/* Improved GIG Social Media Links UI/UX */}
       <div className="mt-16 pb-8 border-t border-gray-800 flex flex-col items-center">
-        <h3 className="text-white text-2xl font-bold mb-6 text-center tracking-tight">Connect with GIG Group</h3>
+        <h3 className="text-white text-2xl font-bold mb-6 text-center tracking-tight">Connect with GIG Group AND GIG Studios</h3>
       <div className="flex gap-6 justify-center items-center">
           <a
             href="https://www.instagram.com/giggroupinc?igsh=MTQ3eWVvMTRxNW90aw%3D%3D&utm_source=qr"

@@ -1,22 +1,24 @@
 import React from 'react';
 import { ExternalLink, ShoppingBag } from 'lucide-react';
-
+import hoodieImg from '../assets/urban-progressive hoodie.jpg';
+import toteImg from '../assets/urban-progressive.jpg';
+import capImg from '../assets/urban-progressive cap.jpg';
 const MerchandiseSection: React.FC = () => {
   const featuredItems = [
     {
-      name: 'Wall Street Bonds Hoodie',
-      price: '$65',
-      image: 'https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg'
+      name: 'WALL STREET BONDS URBAN RENAISSANCE - Stanley/Stella Cruiser Organic Hoodie',
+      price: '$45.99',
+      image: hoodieImg
     },
     {
-      name: 'No Right Way Tee',
-      price: '$28',
-      image: 'https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg'
+      name: 'WALL STREET BONDS URBAN RENAISSANCE - Eco-Friendly Cotton Tote',
+      price: '$20.49',
+      image: toteImg
     },
     {
-      name: 'Rebel Investor Cap',
-      price: '$35',
-      image: 'https://images.pexels.com/photos/1149601/pexels-photo-1149601.jpeg'
+      name: 'WALL STREET BONDS URBAN RENAISSANCE - Organic Baseball Cap',
+      price: '$21.99',
+      image: capImg
     }
   ];
 
@@ -48,13 +50,12 @@ const MerchandiseSection: React.FC = () => {
               key={index}
               className="group bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-gold transition-all duration-300 hover:transform hover:scale-105"
             >
-              <div className="relative overflow-hidden">
+              <div className="relative bg-white rounded-t-xl p-4 flex items-center justify-center h-64">
                 <img 
                   src={item.image}
                   alt={item.name}
-                  className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="max-h-56 w-auto object-contain"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-white mb-2">{item.name}</h3>

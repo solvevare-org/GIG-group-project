@@ -26,12 +26,12 @@ const Footer: React.FC = () => {
               Contact
             </a>
             <a href="https://theurbanren.myspreadshop.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors duration-300">
-              From the Streets to the BoardRooms on WallStreet
+              Merchandise
             </a>
           </div>
           <div className="border-t border-gray-800 pt-8">
             <p className="text-gray-500 text-sm">
-              © 2025 From the Streets to the BoardRooms on WallStreet . All rights reserved. • There's no right way, only your way.
+              © 2025 Copyrights No Right Way or GIG Studio. All rights reserved. • There's no right way, only your way.
             </p>
           </div>
         </div>

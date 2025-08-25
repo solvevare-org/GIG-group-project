@@ -13,7 +13,7 @@ const PressSection: React.FC = () => {
             Making <span className="text-red-500">Headlines</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Our revolutionary approach to financial market is gaining attention from industry leaders and major media outlets
+            Our revolutionary approach to the financial markets is gaining attention from industry leaders and major media outlets
           </p>
         </div>
 
@@ -123,7 +123,7 @@ const PressSection: React.FC = () => {
                   Download AHP Press Kit
                 </a>
                 <button className="border border-gray-600 hover:border-red-500 text-gray-300 hover:text-white px-6 py-2 rounded-full font-semibold transition-colors">
-                  Media Contact
+                  Media Contact Link
                 </button>
               </div>
             </div>
